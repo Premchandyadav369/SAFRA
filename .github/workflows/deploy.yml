@@ -1,0 +1,20 @@
+name: SAFRA Production Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy-status:
+    name: Production Deployment Status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment Information
+        run: |
+          echo "=========================================="
+          echo "  SAFRA - Track 03 AI Revenue Recovery"
+          echo "  Frontend Target: Vercel (Next.js 14)"
+          echo "  Backend Target: Render (FastAPI + Gemma)"
+          echo "=========================================="
+          echo "Ready for production deployments."
