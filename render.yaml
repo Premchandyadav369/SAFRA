@@ -1,0 +1,40 @@
+services:
+  # SAFRA FastAPI Backend Engine
+  - type: web
+    name: safra-backend
+    runtime: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: HF_MODEL_ID
+        value: google/gemma-3-12b-it
+      - key: HF_TOKEN
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./safra.db
+      - key: CORS_ORIGINS
+        value: '["*"]'
+
+  # SAFRA Next.js Frontend (Alternative Render Deployment)
+  - type: web
+    name: safra-frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    rootDir: frontend
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: safra-backend
+          property: host

@@ -1,6 +1,6 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
+from typing import List, Union
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "SAFRA"
@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     API_PREFIX: str = "/api"
     
+    # Server & Port
+    PORT: int = int(os.getenv("PORT", "8000"))
+    HOST: str = os.getenv("HOST", "0.0.0.0")
+
     # Database Settings (SQLite default, PostgreSQL compatible)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./safra.db")
     
@@ -18,12 +22,14 @@ class Settings(BaseSettings):
     # Groq API Fallback (Optional)
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     
-    # CORS Settings
-    CORS_ORIGINS: List[str] = [
+    # Production CORS Settings (Accepts local, Vercel preview & prod domains)
+    CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        "https://safra-frontend.vercel.app",
+        "https://safra.vercel.app",
         "*"
     ]
 
