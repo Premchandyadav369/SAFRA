@@ -18,6 +18,7 @@ from app.api.routes.merchants import router as merchants_router
 from app.api.routes.recovery import router as recovery_router
 from app.api.routes.analytics import router as analytics_router
 from app.api.routes.simulator import router as simulator_router
+from app.api.routes.crypto_proofs import router as crypto_proofs_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,6 +62,7 @@ app.include_router(merchants_router, prefix=settings.API_PREFIX)
 app.include_router(recovery_router, prefix=settings.API_PREFIX)
 app.include_router(analytics_router, prefix=settings.API_PREFIX)
 app.include_router(simulator_router, prefix=settings.API_PREFIX)
+app.include_router(crypto_proofs_router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():
@@ -80,7 +82,8 @@ async def health_check():
         "status": "HEALTHY",
         "engine": "SAFRA",
         "ai_model": settings.HF_MODEL_ID,
-        "database": "CONNECTED"
+        "database": "CONNECTED",
+        "cryptography": "HMAC-SHA256-Merkle-Active"
     }
 
 @app.websocket("/ws")
