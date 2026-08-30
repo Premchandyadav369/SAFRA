@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://db.onlinewebfonts.com/c/04e6981992c0e2e7642af2074ebe3901?family=Helvetica+Now+Display+Bold');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-heading: 'Helvetica Now Display Bold', 'Inter', -apple-system, sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+
+  --color-text: #0C2340;
+  --color-text-muted: #475569;
+  --color-text-light: #64748B;
+
+  --color-razorpay-blue: #0C8CE9;
+  --color-accent: #525CEB;
+  --color-accent-purple: #7342E2;
+
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #F1F5F9;
+
+  --color-success: #00B386;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom minimal scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* React Flow high-contrast styling */
+.react-flow__attribution {
+  display: none !important;
+}
+.react-flow__controls {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08) !important;
+}
+.react-flow__controls button {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  color: #0C2340 !important;
+  fill: #0C2340 !important;
+}
+.react-flow__controls button:hover {
+  background: #F1F5F9 !important;
+  color: #0C8CE9 !important;
+  fill: #0C8CE9 !important;
+}
