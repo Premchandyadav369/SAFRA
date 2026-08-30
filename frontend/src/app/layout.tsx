@@ -3,8 +3,8 @@ import "./globals.css";
 import "@xyflow/react/dist/style.css";
 
 export const metadata: Metadata = {
-  title: "SAFRA — Autonomous Revenue Recovery Intelligence | Razorpay AI Buildathon",
-  description: "Signal-Aware Financial Revenue Agent. Find revenue that's slipping away, diagnose root causes, and execute bounded recovery workflows with Gemma AI.",
+  title: "SAFRA: Autonomous Revenue Recovery Intelligence | Razorpay AI Buildathon",
+  description: "Signal-Aware Financial Revenue Agent. Find revenue that is slipping away, diagnose root causes, and execute bounded recovery workflows with Google Gemma 3.",
   keywords: [
     "SAFRA",
     "Razorpay AI Buildathon",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Premchand Yadav" }],
   openGraph: {
-    title: "SAFRA — Autonomous Revenue Recovery Intelligence",
+    title: "SAFRA: Autonomous Revenue Recovery Intelligence",
     description: "Catch the ₹ slipping before it disappears. Autonomous revenue recovery engine for merchants.",
     siteName: "SAFRA",
     locale: "en_US",
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SAFRA — AI Revenue Recovery Intelligence",
-    description: "Find revenue that's slipping away and win it back with bounded AI workflows.",
+    title: "SAFRA: AI Revenue Recovery Intelligence",
+    description: "Find revenue that is slipping away and win it back with bounded AI workflows.",
   },
 };
 
@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[#F8FAFC] text-[#0C2340] antialiased selection:bg-[#0C8CE9] selection:text-white">
+      <body className="min-h-screen bg-paper text-ink antialiased selection:bg-signal selection:text-white font-body">
         {children}
       </body>
     </html>

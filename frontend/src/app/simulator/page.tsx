@@ -14,6 +14,8 @@ import {
   RotateCcw
 } from "lucide-react";
 import { SafraAPI } from "@/lib/api";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
 
 export default function SimulatorConsole() {
   const [isInjecting, setIsInjecting] = useState(false);
@@ -65,136 +67,144 @@ export default function SimulatorConsole() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-surface-border pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold font-mono text-white">Mission Traffic Simulator</h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-safra-emerald/15 text-safra-emerald border border-safra-emerald/30 font-bold">
-              CONTROL ROOM
+    <div className="min-h-screen bg-paper text-ink font-body antialiased">
+      <Navbar />
+
+      <main className="max-w-[1320px] mx-auto px-6 sm:px-10 py-12 sm:py-16 space-y-12">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-line pb-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold font-display tracking-tight text-ink">
+                Mission Traffic Simulator
+              </h1>
+              <span className="text-[10px] font-mono px-2.5 py-1 rounded-sm bg-safe/15 text-safe border border-safe/30 font-bold">
+                CONTROL ROOM
+              </span>
+            </div>
+            <p className="text-xs text-ink-soft font-mono mt-1">
+              Simulate realistic financial traffic, inject edge failures, and test autonomous system responses live.
+            </p>
+          </div>
+        </div>
+
+        {/* Preset Injection Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Scenario 1: Systemic UPI Incident */}
+          <div className="p-6 sm:p-8 rounded-sm border border-signal bg-surface space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-signal text-xs font-mono font-bold">
+                <span className="flex items-center gap-1.5">
+                  <Flame className="w-4 h-4" />
+                  <span>SYSTEMIC INCIDENT</span>
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-signal/15 font-bold">P1 CRITICAL</span>
+              </div>
+              <h2 className="text-lg font-bold font-display text-ink">Bank Switch & UPI Latency Spike</h2>
+              <p className="text-xs text-ink-soft font-mono leading-relaxed">
+                Injects 1,842 pending transactions across 47 merchants on HDFC Bank (NPCI UPI rail) with ₹42.7L exposure.
+              </p>
+            </div>
+
+            <button
+              onClick={handleInjectUPIIncident}
+              disabled={isInjecting}
+              className="w-full py-3 rounded-sm bg-signal hover:bg-signal-dark text-paper font-display text-xs font-bold uppercase transition-all disabled:opacity-40"
+            >
+              {isInjecting ? "Injecting..." : "Inject 1,842 UPI Incident →"}
+            </button>
+          </div>
+
+          {/* Scenario 2: Merchant Callback Dropout */}
+          <div className="p-6 sm:p-8 rounded-sm border border-warning bg-surface space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-warning text-xs font-mono font-bold">
+                <span className="flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>FINANCIAL DRIFT</span>
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-warning/15 font-bold">DRIFT INJECTION</span>
+              </div>
+              <h2 className="text-lg font-bold font-display text-ink">Merchant Callback Drops</h2>
+              <p className="text-xs text-ink-soft font-mono leading-relaxed">
+                Simulates 24 webhook dropouts on merchant endpoint, inducing ₹25,000 additional financial drift.
+              </p>
+            </div>
+
+            <button
+              onClick={handleInjectCallbackFailure}
+              disabled={isInjecting}
+              className="w-full py-3 rounded-sm bg-warning hover:bg-warning/90 text-paper font-display text-xs font-bold uppercase transition-all disabled:opacity-40"
+            >
+              {isInjecting ? "Injecting..." : "Inject Webhook Drops →"}
+            </button>
+          </div>
+
+          {/* Scenario 3: Pristine Reset */}
+          <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-muted text-xs font-mono font-bold">
+                <span className="flex items-center gap-1.5">
+                  <RotateCcw className="w-4 h-4" />
+                  <span>RESTORE BASELINE</span>
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-paper border border-line">PRISTINE</span>
+              </div>
+              <h2 className="text-lg font-bold font-display text-ink">Reset Canonical Topology</h2>
+              <p className="text-xs text-ink-soft font-mono leading-relaxed">
+                Wipes active incidents, clears database, and re-seeds canonical ₹4,999 hero demo topology.
+              </p>
+            </div>
+
+            <button
+              onClick={handleResetTopology}
+              disabled={isInjecting}
+              className="w-full py-3 rounded-sm bg-paper border border-line hover:bg-paper-dark text-ink font-display text-xs font-bold uppercase transition-all disabled:opacity-40"
+            >
+              {isInjecting ? "Resetting..." : "Reset Topology to Pristine"}
+            </button>
+          </div>
+        </div>
+
+        {/* Simulator Real-Time Event Console */}
+        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-signal" />
+              <h2 className="text-xs font-bold font-mono text-ink uppercase tracking-wider">
+                Simulator Telemetry Console
+              </h2>
+            </div>
+            <span className="text-[10px] font-mono text-muted">
+              {logs.length} Log Entries
             </span>
           </div>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            Simulate realistic financial traffic, inject edge failures, and test autonomous system responses live.
-          </p>
-        </div>
-      </div>
 
-      {/* Preset Injection Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Scenario 1: Systemic UPI Incident */}
-        <div className="p-6 rounded-3xl border border-safra-ruby/40 bg-safra-ruby/5 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-safra-ruby text-xs font-mono font-bold">
-              <span className="flex items-center gap-1.5">
-                <Flame className="w-4 h-4" />
-                <span>SYSTEMIC INCIDENT</span>
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-safra-ruby/20 border border-safra-ruby/40">P1 CRITICAL</span>
-            </div>
-            <h2 className="text-base font-bold font-mono text-white">Bank Switch & UPI Latency Spike</h2>
-            <p className="text-xs text-slate-300 font-mono leading-relaxed">
-              Injects 1,842 pending transactions across 47 merchants on HDFC Bank (NPCI UPI rail) with ₹42.7L exposure.
-            </p>
+          <div className="p-4 rounded-sm bg-paper border border-line font-mono text-xs space-y-2 max-h-60 overflow-y-auto">
+            {logs.map((log, idx) => (
+              <div key={idx} className="flex items-start gap-3">
+                <span className="text-muted text-[10px]">{log.time}</span>
+                <span
+                  className={`font-bold text-[10px] px-1.5 py-0.2 rounded-sm ${
+                    log.type === "SUCCESS"
+                      ? "text-safe bg-safe/10"
+                      : log.type === "WARN"
+                      ? "text-warning bg-warning/10"
+                      : log.type === "ERROR"
+                      ? "text-danger bg-danger/10"
+                      : "text-signal bg-signal/10"
+                  }`}
+                >
+                  [{log.type}]
+                </span>
+                <span className="text-ink flex-1">{log.msg}</span>
+              </div>
+            ))}
           </div>
-
-          <button
-            onClick={handleInjectUPIIncident}
-            disabled={isInjecting}
-            className="w-full py-2.5 rounded-xl bg-safra-ruby hover:bg-safra-ruby/90 text-slate-950 font-mono text-xs font-bold transition-all disabled:opacity-40 shadow-lg shadow-safra-ruby/20"
-          >
-            {isInjecting ? "Injecting..." : "Inject 1,842 UPI Incident →"}
-          </button>
         </div>
+      </main>
 
-        {/* Scenario 2: Merchant Callback Dropout */}
-        <div className="p-6 rounded-3xl border border-safra-amber/40 bg-safra-amber/5 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-safra-amber text-xs font-mono font-bold">
-              <span className="flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4" />
-                <span>FINANCIAL DRIFT</span>
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-safra-amber/20 border border-safra-amber/40">DRIFT INJECTION</span>
-            </div>
-            <h2 className="text-base font-bold font-mono text-white">Merchant Callback Drops</h2>
-            <p className="text-xs text-slate-300 font-mono leading-relaxed">
-              Simulates 24 webhook dropouts on merchant endpoint, inducing ₹25,000 additional financial drift.
-            </p>
-          </div>
-
-          <button
-            onClick={handleInjectCallbackFailure}
-            disabled={isInjecting}
-            className="w-full py-2.5 rounded-xl bg-safra-amber hover:bg-safra-amber/90 text-slate-950 font-mono text-xs font-bold transition-all disabled:opacity-40 shadow-lg shadow-safra-amber/20"
-          >
-            {isInjecting ? "Injecting..." : "Inject Webhook Drops →"}
-          </button>
-        </div>
-
-        {/* Scenario 3: Pristine Reset */}
-        <div className="p-6 rounded-3xl border border-surface-border bg-surface-card space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-slate-400 text-xs font-mono font-bold">
-              <span className="flex items-center gap-1.5">
-                <RotateCcw className="w-4 h-4" />
-                <span>RESTORE BASELINE</span>
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface border border-surface-border">PRISTINE</span>
-            </div>
-            <h2 className="text-base font-bold font-mono text-white">Reset Canonical Topology</h2>
-            <p className="text-xs text-slate-400 font-mono leading-relaxed">
-              Wipes active incidents, clears database, and re-seeds canonical ₹4,999 hero demo topology.
-            </p>
-          </div>
-
-          <button
-            onClick={handleResetTopology}
-            disabled={isInjecting}
-            className="w-full py-2.5 rounded-xl bg-surface border border-surface-border hover:bg-surface-border text-white font-mono text-xs font-bold transition-all disabled:opacity-40"
-          >
-            {isInjecting ? "Resetting..." : "Reset Topology to Pristine"}
-          </button>
-        </div>
-      </div>
-
-      {/* Simulator Real-Time Event Console */}
-      <div className="p-6 rounded-3xl border border-surface-border bg-surface-card space-y-3 shadow-xl">
-        <div className="flex items-center justify-between border-b border-surface-border pb-3">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-safra-cyan" />
-            <h2 className="text-xs font-bold font-mono text-white uppercase tracking-wider">
-              Simulator Telemetry Console
-            </h2>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400">
-            {logs.length} Log Entries
-          </span>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-surface border border-surface-border font-mono text-xs space-y-2 max-h-60 overflow-y-auto">
-          {logs.map((log, idx) => (
-            <div key={idx} className="flex items-start gap-3">
-              <span className="text-slate-500 text-[10px]">{log.time}</span>
-              <span
-                className={`font-bold text-[10px] px-1.5 py-0.2 rounded ${
-                  log.type === "SUCCESS"
-                    ? "text-safra-emerald bg-safra-emerald/10"
-                    : log.type === "WARN"
-                    ? "text-safra-amber bg-safra-amber/10"
-                    : log.type === "ERROR"
-                    ? "text-safra-ruby bg-safra-ruby/10"
-                    : "text-safra-cyan bg-safra-cyan/10"
-                }`}
-              >
-                [{log.type}]
-              </span>
-              <span className="text-slate-300 flex-1">{log.msg}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }
