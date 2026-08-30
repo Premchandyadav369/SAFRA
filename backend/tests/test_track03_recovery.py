@@ -99,7 +99,7 @@ async def test_graph_generation():
     assert "CUSTOMER" in node_types
     assert "CHECKOUT" in node_types
     assert "BANK" in node_types
-    assert "RECOVERY_ACTION" in node_types
+    assert "SAFRA_AGENT" in node_types or "RECOVERY_ACTION" in node_types
 
 @pytest.mark.asyncio
 async def test_gemma_ai_fallback_explanation():

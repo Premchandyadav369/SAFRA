@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Signal-Aware Financial Revenue Agent — Catch the ₹ slipping before it disappears.",
+    description="Signal-Aware Financial Revenue Agent: Catch the ₹ slipping before it disappears.",
     version=settings.VERSION,
     lifespan=lifespan
 )
@@ -66,7 +66,7 @@ app.include_router(simulator_router, prefix=settings.API_PREFIX)
 async def root():
     return {
         "engine": "SAFRA",
-        "track": "Track 03 — AI Revenue Recovery",
+        "track": "Track 03: AI Revenue Recovery",
         "competition": "Razorpay AI Buildathon",
         "tagline": settings.PROJECT_TAGLINE,
         "version": settings.VERSION,

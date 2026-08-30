@@ -1,7 +1,7 @@
-# SAFRA — Signal-Aware Financial Revenue Agent
-### **Autonomous Revenue Recovery Intelligence (Razorpay AI Buildathon — Track 03)**
+# SAFRA: Signal-Aware Financial Revenue Agent
+### **Autonomous Revenue Recovery Intelligence (Razorpay AI Buildathon: Track 03)**
 
-> **"When money moves but certainty doesn't — SAFRA follows the trail, diagnoses root causes, and executes bounded recovery workflows."**
+> **"When money moves but certainty does not: SAFRA follows the trail, diagnoses root causes, and executes bounded recovery workflows."**
 
 [![Build Status](https://github.com/Premchandyadav369/SAFRA/actions/workflows/ci.yml/badge.svg)](https://github.com/Premchandyadav369/SAFRA/actions/workflows/ci.yml)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPremchandyadav369%2FSAFRA&root-directory=frontend)
@@ -77,7 +77,7 @@ $$\text{Action} = \begin{cases}
 │                                         ▼                                   │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │ Graph Engine (NetworkX):                                               │ │
-│  │ Customer ──► Checkout ──► Payment Attempt ──► Bank Switch ──► Reconcile │ │
+│  │ Customer -> Checkout -> Payment Attempt -> Bank Switch -> Reconcile    │ │
 │  │ Active Risk Path Isolation • Missing Edge & Topology Drift Detection   │ │
 │  └──────────────────────────────────────┬─────────────────────────────────┘ │
 │                                         │                                   │
@@ -99,6 +99,7 @@ $$\text{Action} = \begin{cases}
 │  • Editorial Investigation Canvas (DM Sans + Manrope + JetBrains Mono)     │
 │  • Live Transaction Tape & Interactive Step-by-Step Simulator               │
 │  • Microsecond Audit Trail Log & Batch Proof Engine                         │
+│  • 10-Node Relational Topology Network Graph with Path Tracing              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -166,5 +167,5 @@ npm run dev
 ## 👥 Authors & Attribution
 
 - **Lead Developer:** [Premchand Yadav](https://github.com/Premchandyadav369) (`premchand.23bce7167@vitapstudent.ac.in`)
-- **Hackathon:** Razorpay AI Buildathon — **Track 03: AI Revenue Recovery**
+- **Hackathon:** Razorpay AI Buildathon: **Track 03: AI Revenue Recovery**
 - **License:** [MIT](LICENSE)
