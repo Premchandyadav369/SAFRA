@@ -4,9 +4,11 @@ from sqlalchemy import select, func, desc
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from datetime import datetime
+import hashlib
+import uuid
 
 from app.database.session import get_db
-from app.database.models import Transaction, RecoveryAction, AuditEvent, BatchRun, AIExplanation
+from app.database.models import Transaction, Track03RecoveryAction, AuditEvent, BatchRun, AIExplanation, BarrierInterception
 from app.services.signal_engine import SignalEngine
 from app.services.recovery_engine import RecoveryEngine
 from app.services.policy_engine import PolicyEngine
@@ -21,6 +23,29 @@ class RecoverRequestBody(BaseModel):
 
 class ExplainRequestBody(BaseModel):
     question: Optional[str] = None
+
+class AskRequestBody(BaseModel):
+    question: str
+
+class InjectTransactionBody(BaseModel):
+    amount: float = 4999.0
+    currency: str = "INR"
+    merchant_name: str = "Zenith Electronics"
+    customer_name: str = "Aryan Sharma"
+    payment_method: str = "UPI"
+    bank: str = "HDFC Bank"
+    payment_status: str = "PENDING"
+    failure_reason: str = "UPI Callback Timeout (1,420ms latency)"
+    retry_count: int = 1
+    customer_history_score: float = 0.90
+    bank_latency_ms: int = 1420
+
+class BarrierInterceptBody(BaseModel):
+    transaction_id: str
+    amount: float
+    currency: str = "INR"
+    customer_id: str
+    merchant_id: str = "m_zenith_01"
 
 # 1. GET /api/events
 @router.get("/events")
@@ -108,7 +133,70 @@ async def get_dashboard_metrics(db: AsyncSession = Depends(get_db)):
         "recovery_velocity": "+82.4%"
     }
 
-# 3. GET /api/events/{event_id}
+# 3. POST /api/events/inject (Interactive Chaos Sandbox Injection)
+@router.post("/events/inject")
+async def inject_event(body: InjectTransactionBody, db: AsyncSession = Depends(get_db)):
+    txn_id = f"CHAOS-{uuid.uuid4().hex[:8].upper()}"
+    
+    # Create transient model to run engines
+    temp_txn = Transaction(
+        id=txn_id,
+        timestamp=datetime.utcnow(),
+        merchant_id="m_chaos_01",
+        merchant_name=body.merchant_name,
+        customer_id=f"cust_{uuid.uuid4().hex[:6]}",
+        customer_name=body.customer_name,
+        customer_segment="HIGH_VALUE" if body.customer_history_score > 0.8 else "STANDARD",
+        amount=body.amount,
+        currency=body.currency,
+        payment_method=body.payment_method,
+        payment_status=body.payment_status,
+        checkout_status="BANK_DEBITED_AWAITING_WEBHOOK" if "timeout" in body.failure_reason.lower() else "FAILED",
+        failure_reason=body.failure_reason,
+        bank=body.bank,
+        retry_count=body.retry_count,
+        customer_history_score=body.customer_history_score,
+        actual_outcome="UNDER_INVESTIGATION"
+    )
+
+    signals = SignalEngine.extract_signals(temp_txn)
+    recovery_score = RecoveryEngine.calculate_score(temp_txn, signals)
+    policy_eval = PolicyEngine.evaluate(temp_txn, signals, recovery_score)
+
+    temp_txn.signals = signals
+    temp_txn.risk_score = recovery_score["risk_score"]
+    temp_txn.recovery_probability = recovery_score["recovery_probability"]
+    temp_txn.estimated_recovery_value = recovery_score["estimated_recovery_value"]
+    temp_txn.recommended_action = policy_eval["decision"]
+
+    db.add(temp_txn)
+
+    # Add Initial Audit Event
+    audit = AuditEvent(
+        id=f"aud_{txn_id}_init",
+        transaction_id=txn_id,
+        event_type="CHAOS_INJECTION",
+        message=f"Chaos transaction injected with failure: {body.failure_reason}",
+        details=f"P(Recovery)={recovery_score['recovery_probability']:.2f}, Action={policy_eval['decision']}",
+        timestamp=datetime.utcnow()
+    )
+    db.add(audit)
+    await db.commit()
+
+    graph = GraphEngine.build_graph(temp_txn)
+
+    return {
+        "transaction_id": txn_id,
+        "status": "INJECTED_AND_EVALUATED",
+        "evaluated_action": policy_eval["decision"],
+        "recovery_probability": recovery_score["recovery_probability"],
+        "signals": signals,
+        "score_breakdown": recovery_score["score_breakdown"],
+        "stopping_rule": policy_eval["stopping_rule_triggered"],
+        "graph": graph
+    }
+
+# 4. GET /api/events/{event_id}
 @router.get("/events/{event_id}")
 async def get_event_details(event_id: str, db: AsyncSession = Depends(get_db)):
     res = await db.execute(select(Transaction).where(Transaction.id == event_id))
@@ -116,16 +204,6 @@ async def get_event_details(event_id: str, db: AsyncSession = Depends(get_db)):
     if not txn:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return txn
-
-# 4. GET /api/events/{event_id}/signals
-@router.get("/events/{event_id}/signals")
-async def get_event_signals(event_id: str, db: AsyncSession = Depends(get_db)):
-    res = await db.execute(select(Transaction).where(Transaction.id == event_id))
-    txn = res.scalar_one_or_none()
-    if not txn:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    signals = SignalEngine.extract_signals(txn)
-    return {"transaction_id": event_id, "signals": signals}
 
 # 5. GET /api/events/{event_id}/graph
 @router.get("/events/{event_id}/graph")
@@ -136,32 +214,7 @@ async def get_event_graph(event_id: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Transaction not found")
     return GraphEngine.build_graph(txn)
 
-# 6. POST /api/events/{event_id}/analyze
-@router.post("/events/{event_id}/analyze")
-async def analyze_event(event_id: str, db: AsyncSession = Depends(get_db)):
-    res = await db.execute(select(Transaction).where(Transaction.id == event_id))
-    txn = res.scalar_one_or_none()
-    if not txn:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-
-    signals = SignalEngine.extract_signals(txn)
-    recovery_score = RecoveryEngine.calculate_score(txn, signals)
-    policy_eval = PolicyEngine.evaluate(txn, signals, recovery_score)
-
-    return {
-        "transaction_id": event_id,
-        "signals": signals,
-        "risk_score": recovery_score["risk_score"],
-        "recovery_probability": recovery_score["recovery_probability"],
-        "estimated_recovery_value": recovery_score["estimated_recovery_value"],
-        "score_breakdown": recovery_score["score_breakdown"],
-        "policy_decision": policy_eval["decision"],
-        "policy_reason": policy_eval["reason"],
-        "allowed_actions": policy_eval["allowed_actions"],
-        "stopping_rule_triggered": policy_eval["stopping_rule_triggered"]
-    }
-
-# 7. POST /api/events/{event_id}/recover
+# 6. POST /api/events/{event_id}/recover
 @router.post("/events/{event_id}/recover")
 async def recover_event(
     event_id: str,
@@ -180,7 +233,7 @@ async def recover_event(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# 8. GET /api/events/{event_id}/audit
+# 7. GET /api/events/{event_id}/audit
 @router.get("/events/{event_id}/audit")
 async def get_event_audit(event_id: str, db: AsyncSession = Depends(get_db)):
     res = await db.execute(
@@ -201,11 +254,11 @@ async def get_event_audit(event_id: str, db: AsyncSession = Depends(get_db)):
         ]
     }
 
-# 9. POST /api/events/{event_id}/explain (Gemma AI Integration)
-@router.post("/events/{event_id}/explain")
-async def explain_event_with_gemma(
+# 8. POST /api/events/{event_id}/ask (Copilot Q&A with Google Gemma 3)
+@router.post("/events/{event_id}/ask")
+async def ask_copilot_about_event(
     event_id: str,
-    body: Optional[ExplainRequestBody] = None,
+    body: AskRequestBody,
     db: AsyncSession = Depends(get_db)
 ):
     res = await db.execute(select(Transaction).where(Transaction.id == event_id))
@@ -231,19 +284,16 @@ async def explain_event_with_gemma(
         "selected_action": policy_eval["decision"]
     }
 
-    if body and body.question:
-        explanation = await safra_ai_provider.answer_event_question(context, body.question)
-    else:
-        explanation = await safra_ai_provider.explain_risk(context)
+    answer = await safra_ai_provider.answer_event_question(context, body.question)
 
     # Persist explanation
     ai_record = AIExplanation(
-        id=f"ai_exp_{txn.id}_{int(datetime.utcnow().timestamp())}",
+        id=f"ai_q_{txn.id}_{int(datetime.utcnow().timestamp())}",
         transaction_id=txn.id,
         model_name="google/gemma-3-12b-it",
         prompt_context=context,
-        explanation=explanation,
-        question=body.question if body else None,
+        explanation=answer,
+        question=body.question,
         created_at=datetime.utcnow()
     )
     db.add(ai_record)
@@ -251,9 +301,59 @@ async def explain_event_with_gemma(
 
     return {
         "transaction_id": event_id,
-        "model": "google/gemma-3-12b-it",
-        "explanation": explanation,
-        "context": context
+        "question": body.question,
+        "answer": answer,
+        "model": "google/gemma-3-12b-it"
+    }
+
+# 9. POST /api/barrier/intercept & GET /api/barrier/logs
+@router.post("/barrier/intercept")
+async def log_barrier_interception(body: BarrierInterceptBody, db: AsyncSession = Depends(get_db)):
+    collision_hash = hashlib.sha256(
+        f"{body.merchant_id}:{body.customer_id}:{body.amount}:{int(datetime.utcnow().timestamp() // 60)}".encode()
+    ).hexdigest()
+
+    record = BarrierInterception(
+        id=f"bar_{uuid.uuid4().hex[:8]}",
+        transaction_id=body.transaction_id,
+        collision_hash=collision_hash,
+        prevented_amount=body.amount,
+        currency=body.currency,
+        customer_id=body.customer_id,
+        merchant_id=body.merchant_id,
+        interception_reason="Duplicate payment barrier engaged: prevented double-debit during bank settlement delay"
+    )
+    db.add(record)
+    await db.commit()
+
+    return {
+        "status": "INTERCEPTED_AND_LOGGED",
+        "interception_id": record.id,
+        "collision_hash": collision_hash,
+        "prevented_amount": body.amount
+    }
+
+@router.get("/barrier/logs")
+async def get_barrier_logs(db: AsyncSession = Depends(get_db)):
+    res = await db.execute(select(BarrierInterception).order_by(desc(BarrierInterception.created_at)).limit(20))
+    logs = res.scalars().all()
+    return {
+        "total_prevented_inr": sum(l.prevented_amount for l in logs),
+        "interceptions_count": len(logs),
+        "logs": [
+            {
+                "id": l.id,
+                "transaction_id": l.transaction_id,
+                "collision_hash": l.collision_hash,
+                "prevented_amount": l.prevented_amount,
+                "currency": l.currency,
+                "customer_id": l.customer_id,
+                "merchant_id": l.merchant_id,
+                "reason": l.interception_reason,
+                "timestamp": l.created_at.isoformat() if l.created_at else None
+            }
+            for l in logs
+        ]
     }
 
 # 10. POST /api/batch/run
@@ -325,32 +425,4 @@ async def run_batch_simulation(db: AsyncSession = Depends(get_db)):
         "interventions_used": interventions_used,
         "cases_stopped_safely": stopped_safely,
         "cases_escalated": escalated
-    }
-
-# 11. GET /api/analytics/comparison
-@router.get("/analytics/comparison")
-async def get_strategy_comparison(db: AsyncSession = Depends(get_db)):
-    res = await db.execute(select(Transaction))
-    txns = res.scalars().all()
-    total_risk_inr = sum(t.amount if t.currency == "INR" else t.amount * 84 for t in txns if t.payment_status in ["PENDING", "FAILED", "ABANDONED"])
-
-    return {
-        "generic_strategy": {
-            "name": "Generic Recovery Strategy",
-            "description": "Send 1 generic email/SMS for every failure.",
-            "interventions_sent": len(txns),
-            "spam_rate": "100%",
-            "duplicate_charge_risk": "14.2%",
-            "revenue_recovered_inr": round(total_risk_inr * 0.34, 2),
-            "net_recovery_rate": "34.0%"
-        },
-        "safra_strategy": {
-            "name": "SAFRA AI Revenue Recovery",
-            "description": "Signal-aware bounded recovery with anti-spam stopping rules.",
-            "interventions_sent": 84,
-            "customers_protected_from_spam": len(txns) - 84,
-            "duplicate_charge_risk": "0.0%",
-            "revenue_recovered_inr": round(total_risk_inr * 0.824, 2),
-            "net_recovery_rate": "82.4%"
-        }
     }

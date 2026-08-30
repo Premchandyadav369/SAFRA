@@ -5,9 +5,10 @@ import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import TheFlow from "@/components/landing/TheFlow";
 import Signals from "@/components/landing/Signals";
+import RealWorldAnalytics from "@/components/landing/RealWorldAnalytics";
+import ChaosSandbox from "@/components/landing/ChaosSandbox";
 import RecoverySimulator from "@/components/landing/RecoverySimulator";
 import TheGraph from "@/components/landing/TheGraph";
-import RealWorldAnalytics from "@/components/landing/RealWorldAnalytics";
 import AuditTrail from "@/components/landing/AuditTrail";
 import BatchSimulation from "@/components/landing/BatchSimulation";
 import FinalCta from "@/components/landing/FinalCta";
@@ -28,25 +29,28 @@ export default function LandingPage() {
       {/* 4. Financial Signals & Investigation Ledger (#signals) */}
       <Signals />
 
-      {/* 5. Real-World Graphs & Telemetry Analysis */}
+      {/* 5. Real-World Telemetry & Issuer Latency Analytics */}
       <RealWorldAnalytics />
 
-      {/* 6. Autonomous Recovery Simulator & SAFRA Note (#recovery) */}
+      {/* 6. Interactive Chaos Sandbox & AI Copilot */}
+      <ChaosSandbox />
+
+      {/* 7. Autonomous Recovery Simulator & SAFRA Note (#recovery) */}
       <RecoverySimulator />
 
-      {/* 7. Relational Topology Network Graph (#graph) */}
+      {/* 8. Relational Topology Network Graph (#graph) */}
       <TheGraph />
 
-      {/* 8. Deterministic Audit Trail (#about) */}
+      {/* 9. Deterministic Audit Trail (#about) */}
       <AuditTrail />
 
-      {/* 9. Batch Proof & Baseline Benchmark (#batch) */}
+      {/* 10. Batch Proof & Baseline Benchmark (#batch) */}
       <BatchSimulation />
 
-      {/* 10. Conclusion Statement */}
+      {/* 11. Conclusion Statement */}
       <FinalCta />
 
-      {/* 11. Publication Footer */}
+      {/* 12. Publication Footer */}
       <Footer />
     </div>
   );

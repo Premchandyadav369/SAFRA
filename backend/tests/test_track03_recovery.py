@@ -1,5 +1,6 @@
 import pytest
-from app.database.models import Transaction
+import hashlib
+from app.database.models import Transaction, BarrierInterception
 from app.services.signal_engine import SignalEngine
 from app.services.recovery_engine import RecoveryEngine
 from app.services.policy_engine import PolicyEngine
@@ -115,3 +116,26 @@ async def test_gemma_ai_fallback_explanation():
     explanation = await safra_ai_provider.explain_action(context)
     assert len(explanation) > 20
     assert "SAFRA" in explanation or "WAIT" in explanation
+
+@pytest.mark.asyncio
+async def test_barrier_interception_hash():
+    cust_id = "cust_aryan_01"
+    merch_id = "m_zenith_01"
+    amt = 4999.0
+    collision_hash = hashlib.sha256(f"{merch_id}:{cust_id}:{amt}:1000".encode()).hexdigest()
+    assert len(collision_hash) == 64
+
+@pytest.mark.asyncio
+async def test_gemma_ai_copilot_question():
+    context = {
+        "transaction_id": "TEST-TXN-07",
+        "amount": 12800,
+        "currency": "INR",
+        "status": "PENDING",
+        "failure_reason": "UPI Callback Timeout",
+        "selected_action": "WAIT",
+        "recovery_probability": 0.84
+    }
+    answer = await safra_ai_provider.answer_event_question(context, "Why is WAIT the safest action?")
+    assert len(answer) > 20
+    assert "WAIT" in answer or "SAFRA" in answer or "bank" in answer.lower()

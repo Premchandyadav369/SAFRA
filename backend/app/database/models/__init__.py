@@ -11,7 +11,8 @@ from app.database.models.track03 import (
     Track03RecoveryAction,
     AuditEvent,
     BatchRun,
-    AIExplanation
+    AIExplanation,
+    BarrierInterception
 )
 
 __all__ = [
@@ -30,5 +31,6 @@ __all__ = [
     "Track03RecoveryAction",
     "AuditEvent",
     "BatchRun",
-    "AIExplanation"
+    "AIExplanation",
+    "BarrierInterception"
 ]

@@ -80,6 +80,20 @@ class AuditEvent(Base):
     transaction = relationship("Transaction", back_populates="audit_events")
 
 
+class BarrierInterception(Base):
+    __tablename__ = "barrier_interceptions"
+
+    id = Column(String(64), primary_key=True, index=True)
+    transaction_id = Column(String(64), index=True)
+    collision_hash = Column(String(64), nullable=False)
+    prevented_amount = Column(Float, nullable=False)
+    currency = Column(String(8), default="INR")
+    customer_id = Column(String(64), index=True)
+    merchant_id = Column(String(64), index=True)
+    interception_reason = Column(String(256), default="Rapid duplicate repayment attempt during pending bank settlement")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class BatchRun(Base):
     __tablename__ = "batch_runs"
 
