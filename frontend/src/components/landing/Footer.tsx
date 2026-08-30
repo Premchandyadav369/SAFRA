@@ -9,24 +9,27 @@ export default function Footer() {
         <div className="flex items-center gap-3">
           <SafraLogo dotSize={7} />
           <span className="text-muted">•</span>
-          <span className="text-ink font-semibold">Track 03 — AI Revenue Recovery</span>
+          <span className="text-ink font-semibold">Track 03: AI Revenue Recovery</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-6 sm:gap-8">
-          <Link href="#flow" className="hover:text-ink transition-colors uppercase">
-            01 / Trail
+          <Link href="/#flow" className="hover:text-ink transition-colors uppercase">
+            Trail
           </Link>
-          <Link href="#signals" className="hover:text-ink transition-colors uppercase">
-            02 / Signals
+          <Link href="/#signals" className="hover:text-ink transition-colors uppercase">
+            Signals
           </Link>
-          <Link href="#recovery" className="hover:text-ink transition-colors uppercase">
-            03 / Recovery
+          <Link href="/#recovery" className="hover:text-ink transition-colors uppercase">
+            Recovery
           </Link>
-          <Link href="#graph" className="hover:text-ink transition-colors uppercase">
-            04 / Graph
+          <Link href="/#graph" className="hover:text-ink transition-colors uppercase">
+            Graph
           </Link>
-          <Link href="#batch" className="hover:text-ink transition-colors uppercase">
-            05 / Proof
+          <Link href="/#batch" className="hover:text-ink transition-colors uppercase">
+            Proof
+          </Link>
+          <Link href="/methodology" className="hover:text-signal transition-colors uppercase font-bold text-ink">
+            Methodology
           </Link>
         </div>
 

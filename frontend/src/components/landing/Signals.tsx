@@ -44,7 +44,7 @@ export default function Signals() {
         <div className="max-w-[800px] mb-16">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
-              02 / SIGNALS & LEDGER
+              FINANCIAL SIGNALS & LEDGER
             </span>
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">

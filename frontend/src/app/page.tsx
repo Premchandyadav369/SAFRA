@@ -7,6 +7,7 @@ import TheFlow from "@/components/landing/TheFlow";
 import Signals from "@/components/landing/Signals";
 import RecoverySimulator from "@/components/landing/RecoverySimulator";
 import TheGraph from "@/components/landing/TheGraph";
+import RealWorldAnalytics from "@/components/landing/RealWorldAnalytics";
 import AuditTrail from "@/components/landing/AuditTrail";
 import BatchSimulation from "@/components/landing/BatchSimulation";
 import FinalCta from "@/components/landing/FinalCta";
@@ -15,34 +16,37 @@ import Footer from "@/components/landing/Footer";
 export default function LandingPage() {
   return (
     <div className="w-full bg-paper text-ink min-h-screen font-body antialiased">
-      {/* 1. Publication Masthead Navbar */}
+      {/* 1. Publication Masthead Navbar without numbers */}
       <Navbar />
 
       {/* 2. Opening Hero & Live Transaction Tape */}
       <Hero />
 
-      {/* 3. 01 / The Trail Pipeline (#flow) */}
+      {/* 3. Transaction Trail Pipeline (#flow) */}
       <TheFlow />
 
-      {/* 4. 02 / Signals & Investigation Ledger (#signals) */}
+      {/* 4. Financial Signals & Investigation Ledger (#signals) */}
       <Signals />
 
-      {/* 5. 03 / Recovery Simulator & SAFRA Note (#recovery) */}
+      {/* 5. Real-World Graphs & Telemetry Analysis */}
+      <RealWorldAnalytics />
+
+      {/* 6. Autonomous Recovery Simulator & SAFRA Note (#recovery) */}
       <RecoverySimulator />
 
-      {/* 6. 04 / Transaction Trail Graph (#graph) */}
+      {/* 7. Relational Topology Network Graph (#graph) */}
       <TheGraph />
 
-      {/* 7. 05 / Audit Trail Terminal Report (#about) */}
+      {/* 8. Deterministic Audit Trail (#about) */}
       <AuditTrail />
 
-      {/* 8. 06 / Batch Proof & Baseline Comparison (#batch) */}
+      {/* 9. Batch Proof & Baseline Benchmark (#batch) */}
       <BatchSimulation />
 
-      {/* 9. Conclusion Statement */}
+      {/* 10. Conclusion Statement */}
       <FinalCta />
 
-      {/* 10. Publication Footer */}
+      {/* 11. Publication Footer */}
       <Footer />
     </div>
   );

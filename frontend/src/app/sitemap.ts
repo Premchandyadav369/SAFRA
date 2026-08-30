@@ -10,6 +10,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
+      url: `${baseUrl}/methodology`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/dashboard`,
       lastModified: new Date(),
       changeFrequency: "daily",
@@ -19,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/graph`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.7,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/radar`,

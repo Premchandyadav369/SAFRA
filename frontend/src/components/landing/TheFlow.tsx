@@ -65,7 +65,7 @@ export default function TheFlow() {
         <div className="max-w-[800px] mb-16">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
-              01 / THE TRAIL
+              TRANSACTION TRAIL
             </span>
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">
