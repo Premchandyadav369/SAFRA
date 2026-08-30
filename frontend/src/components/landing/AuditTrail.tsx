@@ -1,112 +1,103 @@
 "use client";
 
 import React from "react";
-import { Clock, ShieldCheck, CheckCircle2, AlertCircle, FileText } from "lucide-react";
+import { Terminal, ShieldCheck } from "lucide-react";
 
-interface AuditEntry {
+interface AuditLog {
   time: string;
-  event: string;
-  details: string;
-  type: "INCOMING" | "ANOMALY" | "DECISION" | "OUTCOME";
+  type: string;
+  code: string;
+  explanation: string;
 }
 
-const auditLogs: AuditEntry[] = [
+const auditLogs: AuditLog[] = [
   {
     time: "12:04:22.104",
-    event: "Payment entered pending state",
-    details: "HDFC UPI debit response acknowledged by rail; merchant confirmation callback timed out after 15s.",
-    type: "INCOMING",
+    type: "EVENT",
+    code: "PAYMENT_PENDING",
+    explanation: "HDFC UPI debit acknowledged by payment rail; merchant confirmation callback timed out after 15s.",
   },
   {
     time: "12:04:23.441",
-    event: "Customer reopened checkout cart",
-    details: "Duplicate checkout intent detected for same customer and identical amount (₹4,999).",
-    type: "ANOMALY",
+    type: "SIGNAL",
+    code: "TEMPORARY_BANK_FAILURE",
+    explanation: "Core banking switch latency exceeds normal 180ms baseline (1,420ms observed).",
   },
   {
     time: "12:04:24.018",
-    event: "Bank timeout & cluster surge detected",
-    details: "1,842 pending events grouped on HDFC CBS switch; baseline failure probability 81% recoverable.",
-    type: "ANOMALY",
+    type: "INTERCEPT",
+    code: "DUPLICATE_BARRIER_ENGAGED",
+    explanation: "Customer attempted cart repayment within 60s; barrier held to avoid double debiting.",
   },
   {
     time: "12:04:25.190",
-    event: "Action evaluated against bounded safety policies",
-    details: "Policy Rule 04 matched: Prohibit customer retry prompt when rail debit is confirmed.",
-    type: "DECISION",
+    type: "SCORE",
+    code: "RECOVERY_PROBABILITY = 0.81",
+    explanation: "ML scoring assigns 81% confidence of successful settlement based on 1,842 cohort events.",
   },
   {
     time: "12:04:26.002",
-    event: "Wait recommended (Duplicate Barrier Active)",
-    details: "Cart inventory locked for 5 minutes. Customer displayed friendly pending verification banner.",
-    type: "DECISION",
+    type: "POLICY",
+    code: "WAIT_ALLOWED",
+    explanation: "Policy Rule 04 verified: Prohibit customer retry prompts when rail debit confirmation exists.",
   },
   {
     time: "12:09:28.712",
-    event: "Payment confirmed & auto-reconciled",
-    details: "Delayed webhook delivered. Order dispatched without customer ticket or duplicate charge.",
-    type: "OUTCOME",
+    type: "ACTION",
+    code: "AUTO_RECONCILE_CONFIRMED",
+    explanation: "Delayed webhook ingested. Order dispatched without customer ticket or duplicate charge.",
   },
 ];
 
 export default function AuditTrail() {
   return (
-    <section id="about" className="py-24 px-5 sm:px-8 max-w-[1280px] mx-auto border-t border-[#E2E8F0] bg-[#FFFFFF]">
-      {/* Section Header */}
-      <div className="max-w-[760px] mb-14">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#0C8CE9] uppercase block mb-3">
-          05 / AUDIT TRAIL
-        </span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-black text-[#0C2340] leading-[1.1]">
-          Every action needs a reason.
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-[#334155] font-medium leading-relaxed">
-          SAFRA logs every causal signal and stopping rule, providing full explainability for every automated intervention.
-        </p>
-      </div>
-
-      {/* Audit Waterfall Card */}
-      <div className="p-6 sm:p-10 rounded-3xl bg-[#F8FAFC] border border-[#E2E8F0] shadow-sm space-y-6">
-        <div className="flex items-center justify-between text-xs font-mono text-[#64748B] pb-4 border-b border-[#E2E8F0]">
-          <span className="font-bold text-[#0C2340]">Chronological Decision Log • Event #PAY-4999-HERO</span>
-          <span className="text-[#0C8CE9] font-bold">Deterministic Audit Trace</span>
+    <section id="about" className="py-20 sm:py-28 border-b border-line bg-paper">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        {/* Section Label & Statement */}
+        <div className="max-w-[800px] mb-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
+              05 / AUDIT TRAIL
+            </span>
+          </div>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">
+            Every action needs a reason.
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-ink-soft font-body leading-relaxed max-w-[620px]">
+            SAFRA logs every causal signal and stopping rule, providing full compliance explainability for every automated intervention.
+          </p>
         </div>
 
-        <div className="space-y-3.5">
-          {auditLogs.map((log, idx) => (
-            <div
-              key={idx}
-              className="p-4 rounded-2xl bg-white border border-[#E2E8F0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-[#0C8CE9] transition-all shadow-sm"
-            >
-              <div className="flex items-start sm:items-center gap-3">
-                <span className="text-xs font-mono font-bold text-[#0C8CE9] bg-[#EFF6FF] border border-[#BFDBFE] px-2.5 py-1 rounded-lg shrink-0">
-                  {log.time}
-                </span>
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#0C2340]">
-                    {log.event}
-                  </div>
-                  <p className="text-xs text-[#334155] font-sans mt-0.5 font-medium">
-                    {log.details}
-                  </p>
-                </div>
-              </div>
+        {/* Terminal Log Mixed with Investigative Report (No bulky cards, thin dividers) */}
+        <div className="border border-line bg-surface rounded-sm p-6 sm:p-8 font-mono text-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-line text-ink-soft">
+            <span className="font-bold text-ink uppercase tracking-wider">
+              Chronological Audit Trail • CASE #PAY-4999-HERO
+            </span>
+            <span className="text-signal font-semibold">100% Deterministic</span>
+          </div>
 
-              <span
-                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${
-                  log.type === "OUTCOME"
-                    ? "bg-[#E6F9F4] text-[#008764] border-[#A7F3D0]"
-                    : log.type === "DECISION"
-                    ? "bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]"
-                    : log.type === "ANOMALY"
-                    ? "bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]"
-                    : "bg-[#F1F5F9] text-[#0C2340] border-[#CBD5E1]"
-                }`}
-              >
-                {log.type}
-              </span>
-            </div>
-          ))}
+          <div className="divide-y divide-line">
+            {auditLogs.map((log, idx) => (
+              <div key={idx} className="py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-paper/50 transition-colors px-2">
+                <div className="flex items-start sm:items-center gap-4">
+                  <span className="text-muted text-[11px] shrink-0 font-medium">
+                    {log.time}
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-paper border border-line text-ink shrink-0">
+                    {log.type}
+                  </span>
+                  <span className="font-bold text-ink shrink-0">
+                    {log.code}
+                  </span>
+                </div>
+
+                <p className="text-xs text-ink-soft font-body max-w-[500px] sm:text-right">
+                  {log.explanation}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

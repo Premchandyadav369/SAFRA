@@ -1,232 +1,164 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  User,
-  ShoppingBag,
-  CreditCard,
-  Building,
-  RotateCcw,
-  Headphones,
-  ShieldCheck,
-  Info,
-  Network
-} from "lucide-react";
+import { ArrowRight, Info, CheckCircle2 } from "lucide-react";
 
-interface GraphNode {
+interface TrailNode {
   id: string;
-  label: string;
-  type: string;
-  status: "NORMAL" | "WARNING" | "RESOLVED" | "POLICY";
-  icon: React.ElementType;
-  x: number;
-  y: number;
-  properties: {
-    primary: string;
-    details: string;
-    metrics: string;
-  };
+  name: string;
+  category: "CUSTOMER" | "CHECKOUT" | "PAYMENT" | "BANK" | "RETRY" | "ACTION";
+  state: "NORMAL" | "RISK" | "RECOVERED" | "STOPPED";
+  description: string;
+  metadata: string;
 }
 
-const nodes: GraphNode[] = [
+const trailNodes: TrailNode[] = [
   {
-    id: "node_customer",
-    label: "Customer: Aryan Sharma",
-    type: "CUSTOMER",
-    status: "NORMAL",
-    icon: User,
-    x: 60,
-    y: 80,
-    properties: {
-      primary: "High-intent repeat buyer",
-      details: "4 previous successful purchases on Zenith Store. Low chargeback risk.",
-      metrics: "LTV: ₹24,800 • Device Verified",
-    },
+    id: "n_customer",
+    name: "CUSTOMER",
+    category: "CUSTOMER",
+    state: "NORMAL",
+    description: "Aryan Sharma (LTV: ₹24,800). 4 previous successful checkouts on Zenith Store.",
+    metadata: "Device Authenticated • Zero Chargeback Risk",
   },
   {
-    id: "node_checkout",
-    label: "Zenith Electronics Checkout",
-    type: "CHECKOUT",
-    status: "NORMAL",
-    icon: ShoppingBag,
-    x: 280,
-    y: 80,
-    properties: {
-      primary: "Cart Value: ₹4,999",
-      details: "Items: Wireless Noise-Cancelling Headphones. Cart held safely in inventory.",
-      metrics: "Checkout Time: 10:14:22Z",
-    },
+    id: "n_checkout",
+    name: "CHECKOUT",
+    category: "CHECKOUT",
+    state: "NORMAL",
+    description: "Cart value ₹4,999 locked in inventory. Active session step 3.",
+    metadata: "Order Ref #ORD-98214 • Goods Reserved",
   },
   {
-    id: "node_payment",
-    label: "Payment Attempt: ₹4,999",
-    type: "PAYMENT",
-    status: "WARNING",
-    icon: CreditCard,
-    x: 500,
-    y: 80,
-    properties: {
-      primary: "UPI Pending for 4m 32s",
-      details: "Debited by bank, webhook callback delayed by merchant endpoint.",
-      metrics: "P(Recovery): 81% • Duplicate Risk: 88%",
-    },
+    id: "n_payment",
+    name: "PAYMENT",
+    category: "PAYMENT",
+    state: "RISK",
+    description: "UPI transit initiated. Debited by issuing bank; pending confirmation callback.",
+    metadata: "Rail Latency: 1,420ms • Pending Duration: 4m",
   },
   {
-    id: "node_bank",
-    label: "HDFC Core Banking Switch",
-    type: "BANK",
-    status: "WARNING",
-    icon: Building,
-    x: 720,
-    y: 80,
-    properties: {
-      primary: "Latency: 1,420ms (Spike)",
-      details: "Temporary CBS queuing delay causing delayed delivery receipts.",
-      metrics: "Pending Rate: 14.8% (vs 2.1% baseline)",
-    },
+    id: "n_bank",
+    name: "HDFC CORE SWITCH",
+    category: "BANK",
+    state: "RISK",
+    description: "Upstream Core Banking System timeout spike across 1,842 concurrent transactions.",
+    metadata: "Queue Delay: High • Settlement Expected: 5m",
   },
   {
-    id: "node_retry",
-    label: "Retry Intercepted",
-    type: "RETRY",
-    status: "POLICY",
-    icon: RotateCcw,
-    x: 280,
-    y: 240,
-    properties: {
-      primary: "Duplicate Payment Barrier Active",
-      details: "Customer attempt to repay held safely to avoid double-debiting.",
-      metrics: "Barrier Confidence: 97.4%",
-    },
+    id: "n_retry",
+    name: "RETRY BARRIER",
+    category: "RETRY",
+    state: "RISK",
+    description: "Customer retry intercepted. Cart held safely to protect from double-charging.",
+    metadata: "Duplicate Barrier: Active • Confidence: 97.4%",
   },
   {
-    id: "node_recovery",
-    label: "Recovery Action: Auto-Reconcile",
-    type: "RECOVERY_ACTION",
-    status: "RESOLVED",
-    icon: ShieldCheck,
-    x: 500,
-    y: 240,
-    properties: {
-      primary: "Idempotent Webhook Retry",
-      details: "Auto-synced with merchant database after 5 minutes.",
-      metrics: "Outcome: Verified Recovered ✓",
-    },
-  },
-  {
-    id: "node_support",
-    label: "Support Backlog: 0 Tickets",
-    type: "SUPPORT",
-    status: "RESOLVED",
-    icon: Headphones,
-    x: 720,
-    y: 240,
-    properties: {
-      primary: "Proactive Resolution",
-      details: "Customer was not asked to pay again; no refund dispute created.",
-      metrics: "Dispute Saved: ₹4,999",
-    },
+    id: "n_action",
+    name: "SAFRA RECONCILE",
+    category: "ACTION",
+    state: "RECOVERED",
+    description: "Automated webhook retry reconciles ledger state. ₹4,999 recovered with zero support tickets.",
+    metadata: "Outcome: Verified Recovered ✓",
   },
 ];
 
 export default function TheGraph() {
-  const [selectedNode, setSelectedNode] = useState<GraphNode>(nodes[2]); // Default to Payment
+  const [selectedNode, setSelectedNode] = useState<TrailNode>(trailNodes[2]); // Default on Payment
 
   return (
-    <section id="graph" className="py-24 px-5 sm:px-8 max-w-[1280px] mx-auto border-t border-[#E2E8F0] bg-[#F8FAFC]">
-      {/* Section Header */}
-      <div className="max-w-[760px] mb-14">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#0C8CE9] uppercase block mb-3">
-          04 / THE GRAPH
-        </span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-black text-[#0C2340] leading-[1.1]">
-          One payment is rarely just one payment.
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-[#334155] font-medium leading-relaxed">
-          A transaction becomes clearer when you see what happened around it across checkouts, banking switches, retries, and recovery policies.
-        </p>
-      </div>
-
-      {/* Graph Visual Canvas & Node Property Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left: Relational Topology Canvas */}
-        <div className="lg:col-span-8 p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-sm space-y-6">
-          <div className="flex items-center justify-between text-xs font-mono text-[#64748B]">
-            <span>Click any node to inspect context</span>
-            <span className="text-[#0C8CE9] font-bold">7 Connected Nodes</span>
+    <section id="graph" className="py-20 sm:py-28 border-b border-line bg-paper">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        {/* Section Label & Statement */}
+        <div className="max-w-[800px] mb-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
+              04 / THE GRAPH
+            </span>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-            {nodes.map((node) => {
-              const Icon = node.icon;
-              const isSelected = selectedNode.id === node.id;
-
-              return (
-                <div
-                  key={node.id}
-                  onClick={() => setSelectedNode(node)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-2 ${
-                    isSelected
-                      ? "bg-[#FFFFFF] border-[#0C8CE9] shadow-md ring-2 ring-[#0C8CE9]/30"
-                      : "bg-[#F8FAFC] border-[#E2E8F0] hover:bg-[#FFFFFF] hover:border-[#CBD5E1]"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="w-8 h-8 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#0C2340]">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <span
-                      className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full border ${
-                        node.status === "WARNING"
-                          ? "bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]"
-                          : node.status === "RESOLVED"
-                          ? "bg-[#E6F9F4] text-[#008764] border-[#A7F3D0]"
-                          : "bg-[#F1F5F9] text-[#0C2340] border-[#CBD5E1]"
-                      }`}
-                    >
-                      {node.status}
-                    </span>
-                  </div>
-
-                  <div className="text-xs font-mono font-bold text-[#0C2340] truncate">
-                    {node.label}
-                  </div>
-                  <p className="text-[11px] font-mono text-[#64748B] truncate">
-                    {node.properties.primary}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">
+            One payment is rarely just one payment.
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-ink-soft font-body leading-relaxed max-w-[620px]">
+            A transaction becomes clear when you inspect what happened around it across banks, customer retries, and recovery policies.
+          </p>
         </div>
 
-        {/* Right: Node Context Inspector */}
-        <div className="lg:col-span-4 p-6 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-sm space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-[#E2E8F0] text-xs font-mono font-bold text-[#0C2340]">
-            <Info className="w-4 h-4 text-[#0C8CE9]" />
-            <span>Node Relational Context</span>
+        {/* Transaction Trail Canvas & Inspector Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Connected Transaction Trail Nodes */}
+          <div className="lg:col-span-8 p-6 sm:p-8 bg-surface border border-line rounded-sm space-y-6">
+            <div className="flex items-center justify-between text-xs font-mono text-ink-soft pb-3 border-b border-line">
+              <span className="font-bold text-ink uppercase tracking-wider">Transaction Trail Nodes</span>
+              <span>Click node to reveal context</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {trailNodes.map((node) => {
+                const isSelected = selectedNode.id === node.id;
+                const isRisk = node.state === "RISK";
+                const isRecovered = node.state === "RECOVERED";
+
+                return (
+                  <div
+                    key={node.id}
+                    onClick={() => setSelectedNode(node)}
+                    className={`p-4 rounded-sm border transition-all cursor-pointer space-y-2 ${
+                      isSelected
+                        ? "bg-paper border-signal shadow-sm ring-1 ring-signal"
+                        : "bg-surface border-line hover:border-ink-soft"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full inline-block ${
+                          isRisk
+                            ? "bg-signal"
+                            : isRecovered
+                            ? "bg-safe"
+                            : "bg-ink"
+                        }`}
+                      />
+                      <span className="text-[9px] font-mono text-muted uppercase">
+                        {node.category}
+                      </span>
+                    </div>
+
+                    <div className="font-display font-bold text-sm text-ink truncate">
+                      {node.name}
+                    </div>
+                    <p className="text-[11px] font-mono text-ink-soft truncate font-medium">
+                      {node.metadata}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-              <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Selected Entity</span>
-              <div className="text-sm font-bold font-mono text-[#0C2340]">{selectedNode.label}</div>
-              <span className="text-xs font-mono text-[#0C8CE9] font-semibold block">{selectedNode.type}</span>
+          {/* Right: Node Context Panel */}
+          <div className="lg:col-span-4 p-6 bg-surface border border-line rounded-sm space-y-4 sticky top-24">
+            <div className="flex items-center gap-2 pb-3 border-b border-line text-xs font-mono font-bold text-ink uppercase">
+              <Info className="w-4 h-4 text-signal" />
+              <span>Node Investigation Details</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-              <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Primary Insight</span>
-              <div className="text-xs font-mono font-semibold text-[#0C2340]">{selectedNode.properties.primary}</div>
-            </div>
+            <div className="space-y-3 font-mono text-xs">
+              <div className="p-3.5 bg-paper border border-line rounded-sm space-y-1">
+                <span className="text-[10px] text-muted uppercase block">Entity</span>
+                <div className="font-bold text-sm text-ink">{selectedNode.name}</div>
+                <span className="text-[10px] text-signal font-semibold">{selectedNode.category}</span>
+              </div>
 
-            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-              <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Ecosystem Details</span>
-              <p className="text-xs text-[#334155] leading-relaxed font-sans font-medium">{selectedNode.properties.details}</p>
-            </div>
+              <div className="p-3.5 bg-paper border border-line rounded-sm space-y-1">
+                <span className="text-[10px] text-muted uppercase block">Observation</span>
+                <p className="text-xs text-ink font-body leading-relaxed">{selectedNode.description}</p>
+              </div>
 
-            <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-              <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Live Metric</span>
-              <div className="text-xs font-mono font-bold text-[#008764]">{selectedNode.properties.metrics}</div>
+              <div className="p-3.5 bg-paper border border-line rounded-sm space-y-1">
+                <span className="text-[10px] text-muted uppercase block">Signal Telemetry</span>
+                <div className="text-xs font-bold text-safe">{selectedNode.metadata}</div>
+              </div>
             </div>
           </div>
         </div>

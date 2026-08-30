@@ -4,28 +4,35 @@ import SafraLogo from "./SafraLogo";
 
 export default function Footer() {
   return (
-    <footer className="py-12 px-5 sm:px-8 max-w-[1280px] mx-auto border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-mono text-[#475569] bg-[#FFFFFF]">
-      <div className="flex items-center gap-2.5">
-        <SafraLogo width={22} height={22} fill="#0C2340" />
-        <span className="font-heading font-bold text-sm text-[#0C2340]">SAFRA</span>
-        <span className="text-[#94A3B8]">•</span>
-        <span className="text-[#0C8CE9] font-semibold">Track 03 — AI Revenue Recovery</span>
-      </div>
+    <footer className="py-12 bg-paper border-t border-line font-mono text-xs text-ink-soft">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="flex items-center gap-3">
+          <SafraLogo dotSize={7} />
+          <span className="text-muted">•</span>
+          <span className="text-ink font-semibold">Track 03 — AI Revenue Recovery</span>
+        </div>
 
-      <div className="flex items-center gap-8">
-        <Link href="#flow" className="hover:text-[#0C8CE9] transition-colors">
-          GitHub
-        </Link>
-        <Link href="#signals" className="hover:text-[#0C8CE9] transition-colors">
-          Buildathon Track 03
-        </Link>
-        <Link href="#recovery" className="hover:text-[#0C8CE9] transition-colors">
-          Demo Sandbox
-        </Link>
-      </div>
+        <div className="flex flex-wrap items-center gap-6 sm:gap-8">
+          <Link href="#flow" className="hover:text-ink transition-colors uppercase">
+            01 / Trail
+          </Link>
+          <Link href="#signals" className="hover:text-ink transition-colors uppercase">
+            02 / Signals
+          </Link>
+          <Link href="#recovery" className="hover:text-ink transition-colors uppercase">
+            03 / Recovery
+          </Link>
+          <Link href="#graph" className="hover:text-ink transition-colors uppercase">
+            04 / Graph
+          </Link>
+          <Link href="#batch" className="hover:text-ink transition-colors uppercase">
+            05 / Proof
+          </Link>
+        </div>
 
-      <div className="text-[11px] font-semibold text-[#0C2340]">
-        Built for Razorpay AI Buildathon
+        <div className="text-[11px] text-muted">
+          Razorpay AI Buildathon • 2026
+        </div>
       </div>
     </footer>
   );

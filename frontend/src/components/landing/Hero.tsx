@@ -1,144 +1,104 @@
 "use client";
 
 import React from "react";
-import { motion, Variants } from "framer-motion";
-import { IndianRupee, TrendingDown, ArrowRightCircle, Sparkles, ShieldCheck, Zap } from "lucide-react";
-
-const fadeUp: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 24,
-  },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.12,
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
-  }),
-};
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { mockDataset } from "@/data/mockEvents";
 
 export default function Hero() {
-  const scrollToFlow = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const elem = document.getElementById("flow");
+  const tickerEvents = mockDataset.slice(0, 18);
+
+  const scrollToSection = (id: string) => {
+    const elem = document.getElementById(id);
     if (elem) {
       elem.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <section className="relative w-full min-h-[85vh] flex flex-col justify-center items-center overflow-hidden px-5 sm:px-8 bg-gradient-to-b from-[#FFFFFF] via-[#F8FAFC] to-[#EEF2F6]">
-      {/* Subtle Atmospheric Video Layer */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 z-0 w-full h-full object-cover opacity-20 pointer-events-none"
-      >
-        <source
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260606_131516_eca35265-ea66-4fbd-8d52-22aae6e1a503.mp4"
-          type="video/mp4"
-        />
-      </video>
-
-      {/* Hero Content Container */}
-      <div className="relative z-10 max-w-[720px] mx-auto text-center pt-10 sm:pt-14 pb-16">
-        {/* Track 03 Tag Badge */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          custom={0}
-          variants={fadeUp}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E6F9F4] border border-[#00B386]/30 text-[#008764] text-xs font-mono font-bold uppercase tracking-wider mb-6 shadow-sm"
-        >
-          <span className="w-2 h-2 rounded-full bg-[#00B386] animate-pulse" />
-          <span>Razorpay Buildathon • Track 03: AI Revenue Recovery</span>
-        </motion.div>
-
-        {/* Main Heading */}
-        <motion.h1
-          initial="hidden"
-          animate="visible"
-          custom={1}
-          variants={fadeUp}
-          className="font-heading text-4xl sm:text-6xl lg:text-[4.2rem] font-black text-[#0C2340] leading-[1.04] tracking-tight"
-        >
-          Catch the{" "}
-          <span className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-[#E6F9F4] text-[#00B386] border border-[#00B386]/30 align-middle -translate-y-1 mx-1 shadow-sm">
-            <IndianRupee className="w-6 h-6 sm:w-8 sm:h-8" />
-          </span>{" "}
-          slipping <br className="hidden sm:block" />
-          before it disappears{" "}
-          <span className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-[#FEE2E2] text-[#EF4444] border border-[#EF4444]/30 align-middle -translate-y-1 mx-1 shadow-sm">
-            <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8" />
+    <section className="relative w-full pt-16 sm:pt-24 pb-14 border-b border-line overflow-hidden bg-paper">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        {/* Label Above Heading */}
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-2 h-2 rounded-full bg-signal inline-block" />
+          <span className="text-[11px] font-mono font-semibold uppercase tracking-[0.2em] text-ink-soft">
+            Track 03 • Revenue Recovery Intelligence
           </span>
-          .
-        </motion.h1>
+        </div>
 
-        {/* Subtext */}
-        <motion.p
-          initial="hidden"
-          animate="visible"
-          custom={2}
-          variants={fadeUp}
-          className="mt-6 text-base sm:text-lg text-[#334155] max-w-[620px] mx-auto leading-relaxed font-sans font-medium"
-        >
-          Some revenue doesn&apos;t fail. It hesitates, retries, gets forgotten, or quietly walks out of checkout. SAFRA follows the trail, diagnoses root causes, and chooses the safest bounded action to win it back.
-        </motion.p>
+        {/* Large Editorial Headline */}
+        <div className="max-w-[1100px] mb-8">
+          <h1 className="font-display text-[clamp(2.8rem,7.5vw,6.8rem)] font-bold text-ink leading-[0.96] tracking-[-0.04em]">
+            Some money fails. <br />
+            Some money waits.
+          </h1>
+          <p className="mt-4 font-display text-[clamp(1.5rem,3.2vw,2.8rem)] font-medium text-ink-soft tracking-tight">
+            SAFRA knows the difference.
+          </p>
+        </div>
 
-        {/* Primary CTA Buttons */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          custom={3}
-          variants={fadeUp}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <motion.a
-            href="#flow"
-            onClick={scrollToFlow}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="min-w-[230px] px-7 py-4 rounded-full bg-[#0C8CE9] hover:bg-[#0274C6] text-white font-bold text-sm sm:text-base flex items-center justify-between gap-6 shadow-[0_10px_25px_rgba(12,140,233,0.3)] transition-all cursor-pointer"
-          >
-            <span>See what SAFRA finds</span>
-            <ArrowRightCircle className="w-5 h-5" />
-          </motion.a>
-
-          <a
-            href="#recovery"
-            className="px-6 py-4 rounded-full bg-[#FFFFFF] hover:bg-[#F1F5F9] text-[#0C2340] font-bold text-sm border border-[#CBD5E1] shadow-sm transition-all flex items-center gap-2"
-          >
-            <Zap className="w-4 h-4 text-[#525CEB]" />
-            <span>Interactive Simulator</span>
-          </a>
-        </motion.div>
-
-        {/* Quick Micro Trust Badges */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          custom={4}
-          variants={fadeUp}
-          className="mt-12 pt-8 border-t border-[#E2E8F0] grid grid-cols-3 gap-2 text-center text-xs font-mono font-bold text-[#475569]"
-        >
-          <div className="flex items-center justify-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[#00B386]" />
-            <span>Bounded Actions Only</span>
+        {/* Investigative Context */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4 pb-10 border-t border-line/70 max-w-[1100px]">
+          <div className="md:col-span-8">
+            <p className="text-base sm:text-lg text-ink font-body leading-relaxed max-w-[680px]">
+              Revenue does not disappear in one clean moment. A payment hesitates, a checkout is abandoned, or a bank webhook is delayed. SAFRA follows the transaction trail, isolates root causes, and executes bounded recovery with zero duplicate charges.
+            </p>
           </div>
-          <div className="flex items-center justify-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#0C8CE9]" />
-            <span>Gemma 3 AI Reasoning</span>
+
+          <div className="md:col-span-4 flex flex-col justify-end gap-3 sm:items-end">
+            <button
+              onClick={() => scrollToSection("flow")}
+              className="px-6 py-3.5 bg-ink hover:bg-ink-soft text-paper text-xs font-display font-bold tracking-wider uppercase rounded-sm flex items-center justify-between gap-4 transition-colors w-full sm:w-auto"
+            >
+              <span>FOLLOW THE TRAIL</span>
+              <ArrowRight className="w-4 h-4 text-signal" />
+            </button>
+
+            <button
+              onClick={() => scrollToSection("signals")}
+              className="text-xs font-mono font-semibold text-ink-soft hover:text-ink tracking-wider uppercase underline underline-offset-4 decoration-line transition-colors sm:self-end"
+            >
+              SEE 500 EVENTS ↓
+            </button>
           </div>
-          <div className="flex items-center justify-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-            <span>Anti-Spam Stopping Rules</span>
+        </div>
+      </div>
+
+      {/* Live Transaction Tape Ticker */}
+      <div className="w-full mt-4 pt-4 border-t border-line bg-surface/50 overflow-hidden">
+        <div className="max-w-[1320px] mx-auto px-6 sm:px-10 mb-2 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-muted">
+          <span>Live Transaction Stream</span>
+          <span>Click any event to investigate</span>
+        </div>
+
+        <div className="relative w-full overflow-hidden whitespace-nowrap py-2.5">
+          <div className="animate-ticker flex items-center gap-6">
+            {tickerEvents.concat(tickerEvents).map((evt, idx) => (
+              <button
+                key={`${evt.id}-${idx}`}
+                onClick={() => scrollToSection("recovery")}
+                className="inline-flex items-center gap-3 px-3 py-1.5 rounded-sm bg-paper border border-line hover:border-signal text-xs font-mono transition-colors text-left group"
+              >
+                <span className="font-bold text-ink">
+                  {evt.currency === "INR" ? "₹" : "$"}{evt.amount.toLocaleString()}
+                </span>
+                <span className="text-ink-soft">{evt.payment_method}</span>
+                <span
+                  className={`text-[10px] font-bold px-1.5 py-0.2 rounded-sm ${
+                    evt.payment_status === "PENDING"
+                      ? "bg-warning/15 text-warning"
+                      : evt.payment_status === "RECOVERED"
+                      ? "bg-safe/15 text-safe"
+                      : "bg-danger/15 text-danger"
+                  }`}
+                >
+                  {evt.payment_status}
+                </span>
+                <ArrowUpRight className="w-3 h-3 text-muted group-hover:text-signal transition-colors" />
+              </button>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

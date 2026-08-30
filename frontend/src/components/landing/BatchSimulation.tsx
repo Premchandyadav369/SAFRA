@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Play, RotateCcw, CheckCircle2, ShieldCheck, Sparkles, TrendingUp, Users } from "lucide-react";
+import { Play, ArrowRight, CheckCircle2 } from "lucide-react";
 import axios from "axios";
 
 export default function BatchSimulation() {
@@ -26,146 +26,135 @@ export default function BatchSimulation() {
       }
       setProcessedCount(count);
       setCurrentProgress(Math.round((count / totalEvents) * 100));
-    }, 60);
+    }, 50);
 
     try {
       await axios.post("http://localhost:8000/api/batch/run", {});
     } catch (e) {
-      // Handled seamlessly
+      // Graceful fallback
     }
   };
 
   return (
-    <section id="batch" className="py-24 px-5 sm:px-8 max-w-[1280px] mx-auto border-t border-[#E2E8F0] bg-[#F8FAFC]">
-      {/* Section Header */}
-      <div className="max-w-[760px] mb-14">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#0C8CE9] uppercase block mb-3">
-          06 / BATCH VERIFICATION
-        </span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-black text-[#0C2340] leading-[1.1]">
-          One recovery is a story. A batch is proof.
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-[#334155] font-medium leading-relaxed">
-          SAFRA processes high-volume event streams, continuously balancing recovered revenue against customer touchpoint friction.
-        </p>
-      </div>
-
-      {/* Batch Processing Console Card */}
-      <div className="p-6 sm:p-10 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-md space-y-8">
-        {/* Trigger Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
-          <div>
-            <div className="text-xs font-mono font-bold uppercase text-[#0C2340]">
-              Continuous 500-Record Stream Evaluation
-            </div>
-            <p className="text-xs font-mono text-[#64748B]">
-              Processed {processedCount} of {totalEvents} events in synthetic sandbox
-            </p>
+    <section id="batch" className="py-20 sm:py-28 border-b border-line bg-paper">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        {/* Section Label & Statement */}
+        <div className="max-w-[800px] mb-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
+              06 / BATCH PROOF
+            </span>
           </div>
-
-          <button
-            onClick={handleRunBatch}
-            disabled={isRunning}
-            className="px-6 py-3 rounded-full bg-[#0C8CE9] hover:bg-[#0274C6] disabled:opacity-50 text-white text-xs font-mono font-bold flex items-center gap-2 shadow-md shadow-[#0C8CE9]/30 transition-all cursor-pointer"
-          >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            <span>{isRunning ? `Processing (${currentProgress}%)...` : "Run Batch Simulation"}</span>
-          </button>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">
+            One recovery is a story. A batch is proof.
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-ink-soft font-body leading-relaxed max-w-[620px]">
+            SAFRA continuously processes event streams, balancing recovered revenue against customer touchpoint friction.
+          </p>
         </div>
 
-        {/* Progress Bar */}
-        {isRunning && (
-          <div className="space-y-2 animate-pulse">
-            <div className="flex justify-between text-xs font-mono font-bold text-[#0C8CE9]">
-              <span>Batch Stream Ingestion Active</span>
-              <span>{currentProgress}%</span>
+        {/* Live Batch Simulation Console */}
+        <div className="border border-line bg-surface rounded-sm p-6 sm:p-10 space-y-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-line">
+            <div>
+              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted">
+                BATCH 01 / LIVE SIMULATION
+              </div>
+              <div className="font-mono text-sm font-bold text-ink mt-0.5">
+                {processedCount} / {totalEvents} EVENTS ANALYZED
+              </div>
             </div>
-            <div className="w-full bg-[#F1F5F9] h-2 rounded-full overflow-hidden border border-[#E2E8F0]">
+
+            <button
+              onClick={handleRunBatch}
+              disabled={isRunning}
+              className="px-6 py-3 bg-ink hover:bg-ink-soft disabled:opacity-50 text-paper text-xs font-display font-bold uppercase tracking-wider rounded-sm flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <Play className="w-3.5 h-3.5 fill-current text-signal" />
+              <span>{isRunning ? `Processing (${currentProgress}%)...` : "Run Batch Simulation"}</span>
+            </button>
+          </div>
+
+          {/* Horizontal Progress Line */}
+          <div className="space-y-2">
+            <div className="w-full bg-paper-dark h-1 rounded-none overflow-hidden">
               <div
-                className="bg-[#0C8CE9] h-full transition-all duration-75"
+                className="bg-signal h-full transition-all duration-75"
                 style={{ width: `${currentProgress}%` }}
               />
             </div>
           </div>
-        )}
 
-        {/* Dynamic Multi-Color Metric Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-          <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-            <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Events Analysed</span>
-            <div className="text-2xl font-black font-mono text-[#0C2340]">{processedCount}</div>
-            <p className="text-xs font-mono text-[#64748B]">Full 500 Dataset</p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#FECACA] space-y-1">
-            <span className="text-xs font-mono font-bold text-[#DC2626] uppercase block">Revenue At Risk</span>
-            <div className="text-2xl font-black font-mono text-[#DC2626]">₹48.2L</div>
-            <p className="text-xs font-mono text-[#64748B]">Across 500 txns</p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#BFDBFE] space-y-1">
-            <span className="text-xs font-mono font-bold text-[#2563EB] uppercase block">Recoverable</span>
-            <div className="text-2xl font-black font-mono text-[#2563EB]">₹36.8L</div>
-            <p className="text-xs font-mono text-[#64748B]">High ML Probability</p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#A7F3D0] space-y-1">
-            <span className="text-xs font-mono font-bold text-[#059669] uppercase block">Recovered</span>
-            <div className="text-2xl font-black font-mono text-[#059669]">₹31.4L</div>
-            <p className="text-xs font-mono text-[#059669] font-bold">+82.4% Net Yield</p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-            <span className="text-xs font-mono font-bold text-[#64748B] uppercase block">Stopped Safely</span>
-            <div className="text-2xl font-black font-mono text-[#0C2340]">142</div>
-            <p className="text-xs font-mono text-[#64748B]">0 Duplicate Debits</p>
-          </div>
-        </div>
-
-        {/* Baseline Strategy Comparison */}
-        <div className="pt-6 border-t border-[#E2E8F0] space-y-4">
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0C2340]">
-            Benchmark: Generic Recovery Strategy vs. SAFRA
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Generic Recovery */}
-            <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#FECACA] space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[#DC2626] uppercase">
-                  Generic Recovery Strategy
-                </span>
-                <span className="text-[10px] font-mono bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA] px-2 py-0.5 rounded-full font-bold">
-                  High Spam & Friction
-                </span>
+          {/* Live Values Under Line */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 font-mono">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase text-muted block">₹ Recovered</span>
+              <div className="font-display text-3xl font-bold text-safe">
+                ₹{((processedCount * 7880) / 100000).toFixed(1)}L
               </div>
-              <p className="text-xs text-[#334155] font-sans font-medium leading-relaxed">
-                Sends 1 generic email/SMS for every failure without inspecting banking switches or pending states.
-              </p>
-              <div className="pt-2 border-t border-[#E2E8F0] text-xs font-mono space-y-1 text-[#0C2340]">
-                <div>• Customer Interventions: <strong>500 (100% spam rate)</strong></div>
-                <div>• Duplicate Charge Risk: <strong>HIGH (14% duplicate retries)</strong></div>
-                <div>• Net Recovery Rate: <strong>34.2%</strong></div>
-              </div>
+              <span className="text-xs text-safe font-semibold">+82.4% Net Yield</span>
             </div>
 
-            {/* SAFRA Strategy */}
-            <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#A7F3D0] shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[#059669] uppercase">
-                  SAFRA AI Revenue Recovery
-                </span>
-                <span className="text-[10px] font-mono bg-[#E6F9F4] text-[#008764] border border-[#A7F3D0] px-2 py-0.5 rounded-full font-bold">
-                  Signal-Driven & Bounded
-                </span>
+            <div className="space-y-1 sm:border-l sm:border-line sm:pl-6">
+              <span className="text-[10px] uppercase text-muted block">₹ At Risk</span>
+              <div className="font-display text-3xl font-bold text-ink">
+                ₹{((processedCount * 9145) / 100000).toFixed(1)}L
               </div>
-              <p className="text-xs text-[#334155] font-sans font-medium leading-relaxed">
-                Evaluates graph relations, enforces duplicate payment barrier, and acts only on high-confidence recoverable signals.
-              </p>
-              <div className="pt-2 border-t border-[#E2E8F0] text-xs font-mono space-y-1 text-[#0C2340]">
-                <div>• Customer Interventions: <strong>142 Targeted Safe Interventions</strong></div>
-                <div>• Duplicate Charge Risk: <strong>0% (100% Barrier Protection)</strong></div>
-                <div>• Net Recovery Rate: <strong>82.4% (₹31.4L Won Back)</strong></div>
+              <span className="text-xs text-ink-soft">Across 500 events</span>
+            </div>
+
+            <div className="space-y-1 sm:border-l sm:border-line sm:pl-6">
+              <span className="text-[10px] uppercase text-muted block">Actions Avoided</span>
+              <div className="font-display text-3xl font-bold text-signal">
+                {Math.round(processedCount * 0.716)}
+              </div>
+              <span className="text-xs text-signal font-semibold">Customers protected from spam</span>
+            </div>
+          </div>
+
+          {/* Two-Column Editorial Baseline Comparison */}
+          <div className="pt-8 border-t border-line space-y-6">
+            <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted">
+              Benchmark: Generic Strategy vs. SAFRA
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+              {/* Generic Column */}
+              <div className="p-6 bg-paper/50 border border-line rounded-sm space-y-4 font-mono text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-ink text-sm">GENERIC RECOVERY</span>
+                  <span className="text-[10px] text-danger bg-danger/10 px-2 py-0.5 rounded-sm font-bold">
+                    HIGH SPAM
+                  </span>
+                </div>
+                <p className="text-xs text-ink-soft font-body leading-relaxed">
+                  Sends 1 generic email/SMS for every failure without inspecting banking switches or pending states.
+                </p>
+                <div className="space-y-2 pt-2 border-t border-line text-ink">
+                  <div>• Revenue Recovered: <strong>₹16.48L (34.2%)</strong></div>
+                  <div>• Interventions Sent: <strong>500 (100% spam rate)</strong></div>
+                  <div>• Duplicate Charge Risk: <strong>14.2%</strong></div>
+                  <div>• Stopping Rules: <strong>0 enforced</strong></div>
+                </div>
+              </div>
+
+              {/* SAFRA Column */}
+              <div className="p-6 bg-paper border border-signal rounded-sm space-y-4 font-mono text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-signal text-sm">SAFRA AI STRATEGY</span>
+                  <span className="text-[10px] text-safe bg-safe/10 px-2 py-0.5 rounded-sm font-bold">
+                    SIGNAL BOUNDED
+                  </span>
+                </div>
+                <p className="text-xs text-ink-soft font-body leading-relaxed">
+                  Evaluates graph relations, enforces duplicate payment barrier, and acts only on high-confidence signals.
+                </p>
+                <div className="space-y-2 pt-2 border-t border-line text-ink">
+                  <div>• Revenue Recovered: <strong className="text-safe">₹39.71L (82.4%)</strong></div>
+                  <div>• Interventions Sent: <strong>142 targeted actions</strong></div>
+                  <div>• Duplicate Charge Risk: <strong className="text-safe">0.0% (Barrier Protection)</strong></div>
+                  <div>• Customers Guarded: <strong>358 buyers protected</strong></div>
+                </div>
               </div>
             </div>
           </div>

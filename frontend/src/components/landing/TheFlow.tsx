@@ -1,154 +1,199 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle2, Clock, ArrowRight, ShieldCheck, IndianRupee, Sparkles, Layers } from "lucide-react";
+import { ArrowDown, Check, AlertCircle, ArrowRight, ShieldCheck } from "lucide-react";
 
-interface FlowStep {
-  step: string;
+interface TrailStep {
+  id: string;
+  stage: string;
   title: string;
-  subtitle: string;
-  eventSnippet: string;
+  status: "NORMAL" | "RISK" | "RECOVERED" | "BRANCH";
+  signal: string;
   details: string;
-  badge: string;
-  badgeColor: string;
 }
 
-const flowStages: FlowStep[] = [
+const trailSteps: TrailStep[] = [
   {
-    step: "1",
+    id: "step_1",
+    stage: "01",
     title: "Customer checks out",
-    subtitle: "Cart Locked & Initiated",
-    eventSnippet: "₹4,999 • UPI • HDFC Transit",
-    details: "Aryan Sharma initiates payment for consumer electronics on Zenith Store. Intent is high.",
-    badge: "INITIATED",
-    badgeColor: "bg-[#F1F5F9] text-[#0C2340] border-[#CBD5E1]",
+    status: "NORMAL",
+    signal: "CART_LOCKED • ₹4,999",
+    details: "Aryan Sharma proceeds to final payment on Zenith Store. High customer intent score (0.92).",
   },
   {
-    step: "2",
-    title: "Payment hesitates",
-    subtitle: "Bank response delayed",
-    eventSnippet: "Bank Debited ✓ • Callback 504 Timeout",
-    details: "Money leaves customer account, but merchant callback times out after 15s. Traditional apps show 'Pending'.",
-    badge: "UNCERTAIN",
-    badgeColor: "bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]",
+    id: "step_2",
+    stage: "02",
+    title: "Payment state fragments",
+    status: "RISK",
+    signal: "BANK_DEBITED_AWAITING_WEBHOOK • LATENCY_1420MS",
+    details: "HDFC bank accounts funds debited, but merchant confirmation callback timed out. Traditional systems log 'Pending'.",
   },
   {
-    step: "3",
-    title: "The trail fragments",
-    subtitle: "Customer retries checkout",
-    eventSnippet: "Second Intent Created • Duplicate Risk 88%",
-    details: "Unaware of the bank debit, customer re-opens checkout to repay. Unchecked systems double-charge here.",
-    badge: "AT RISK",
-    badgeColor: "bg-[#FEE2E2] text-[#B91C1C] border-[#FECACA]",
+    id: "step_3",
+    stage: "03",
+    title: "Second intent intercepted",
+    status: "RISK",
+    signal: "DUPLICATE_BARRIER_ENGAGED • PROXIMITY_97%",
+    details: "Uncertain buyer re-attempts checkout. SAFRA activates the duplicate payment barrier to prevent double charges.",
   },
   {
-    step: "4",
-    title: "SAFRA connects it",
-    subtitle: "Graph correlation active",
-    eventSnippet: "81% Recovery Probability • Cluster #482",
-    details: "SAFRA correlates the bank telemetry and 1,842 cohort transactions, identifying that settlement will complete in 5m.",
-    badge: "DIAGNOSED",
-    badgeColor: "bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]",
+    id: "step_4",
+    stage: "04",
+    title: "Signal correlation & diagnosis",
+    status: "BRANCH",
+    signal: "P(RECOVERY) = 81% • CLUSTER_SURGE",
+    details: "ML engine analyzes 1,842 similar bank switch timeouts, predicting webhook resolution in 5 minutes.",
   },
   {
-    step: "5",
-    title: "The right move is made",
-    subtitle: "Bounded action executed",
-    eventSnippet: "Duplicate Barrier Shown • ₹4,999 Won Back",
-    details: "SAFRA displays the Duplicate Barrier, locks the order safely, and auto-confirms upon webhook delivery.",
-    badge: "RECOVERED",
-    badgeColor: "bg-[#E6F9F4] text-[#008764] border-[#A7F3D0]",
+    id: "step_5",
+    stage: "05",
+    title: "Bounded action & auto-reconcile",
+    status: "RECOVERED",
+    signal: "RECOVERED • ₹4,999 WON BACK",
+    details: "SAFRA locks inventory safely and reconciles order state immediately upon webhook delivery without support overhead.",
   },
 ];
 
 export default function TheFlow() {
-  const [activeStage, setActiveStage] = useState<number>(0);
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(1); // Default on risk stage
 
   return (
-    <section id="flow" className="py-24 px-5 sm:px-8 max-w-[1280px] mx-auto border-t border-[#E2E8F0] bg-[#FFFFFF]">
-      {/* Section Header */}
-      <div className="max-w-[760px] mb-16">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#0C8CE9] uppercase block mb-3">
-          01 / THE FLOW
-        </span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-black text-[#0C2340] leading-[1.1]">
-          Money rarely disappears all at once.
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-[#334155] font-medium leading-relaxed">
-          It leaks through a sequence of small, fragmented events across checkouts, network rails, and bank switches.
-        </p>
-      </div>
-
-      {/* 5-Stage Interactive Story Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 relative">
-        {flowStages.map((stage, idx) => {
-          const isActive = idx === activeStage;
-          const isPassed = idx < activeStage;
-
-          return (
-            <div
-              key={stage.step}
-              onClick={() => setActiveStage(idx)}
-              className={`p-6 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
-                isActive
-                  ? "bg-[#FFFFFF] border-[#0C8CE9] shadow-lg ring-2 ring-[#0C8CE9]/30"
-                  : isPassed
-                  ? "bg-[#F8FAFC] border-[#CBD5E1]"
-                  : "bg-[#FFFFFF] border-[#E2E8F0] hover:border-[#94A3B8]"
-              }`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-2xl font-black text-[#0C8CE9]">
-                    0{stage.step}
-                  </span>
-                  <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${stage.badgeColor}`}
-                  >
-                    {stage.badge}
-                  </span>
-                </div>
-
-                <h3 className="font-heading text-lg font-bold text-[#0C2340] leading-snug">
-                  {stage.title}
-                </h3>
-                <p className="text-xs font-mono font-semibold text-[#64748B]">
-                  {stage.subtitle}
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-[#E2E8F0] text-xs font-mono text-[#0C2340]">
-                <div className="font-bold text-[#0C8CE9] pb-1">{stage.eventSnippet}</div>
-                <p className="text-[#334155] text-xs leading-relaxed font-sans">{stage.details}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Stepper Controls */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] shadow-sm">
-        <div className="text-xs font-mono text-[#0C2340] flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#0C8CE9]" />
-          <span>Stage {activeStage + 1} of 5: <strong>{flowStages[activeStage].title}</strong></span>
+    <section id="flow" className="py-20 sm:py-28 border-b border-line bg-paper">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        {/* Section Label & Statement */}
+        <div className="max-w-[800px] mb-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-signal uppercase">
+              01 / THE TRAIL
+            </span>
+          </div>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight">
+            Money rarely disappears in one event.
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-ink-soft font-body leading-relaxed max-w-[620px]">
+            It leaks across disconnected checkout hops, banking switch latencies, and panic retries. Follow the transaction path below:
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveStage((prev) => Math.max(0, prev - 1))}
-            disabled={activeStage === 0}
-            className="px-4 py-2 rounded-full bg-[#FFFFFF] border border-[#CBD5E1] text-xs font-bold text-[#0C2340] disabled:opacity-40 hover:bg-[#F1F5F9] transition-colors"
-          >
-            ← Previous
-          </button>
-          <button
-            onClick={() => setActiveStage((prev) => Math.min(flowStages.length - 1, prev + 1))}
-            disabled={activeStage === flowStages.length - 1}
-            className="px-5 py-2 rounded-full bg-[#0C8CE9] text-white text-xs font-bold disabled:opacity-40 hover:bg-[#0274C6] transition-colors flex items-center gap-1 shadow-sm"
-          >
-            <span>Next Stage</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+        {/* Structural Pipeline Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Interactive Step Cards */}
+          <div className="lg:col-span-7 space-y-3">
+            {trailSteps.map((step, idx) => {
+              const isSelected = idx === activeStepIndex;
+              const isRisk = step.status === "RISK";
+              const isRecovered = step.status === "RECOVERED";
+
+              return (
+                <div
+                  key={step.id}
+                  onClick={() => setActiveStepIndex(idx)}
+                  className={`p-5 rounded-sm border transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-surface border-signal shadow-sm ring-1 ring-signal"
+                      : "bg-surface/50 border-line hover:border-ink-soft"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-4 mb-2">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-mono font-bold ${isSelected ? "text-signal" : "text-muted"}`}>
+                        {step.stage}
+                      </span>
+                      <h3 className="font-display text-base sm:text-lg font-bold text-ink">
+                        {step.title}
+                      </h3>
+                    </div>
+
+                    <span
+                      className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-sm ${
+                        isRisk
+                          ? "bg-signal/10 text-signal"
+                          : isRecovered
+                          ? "bg-safe/10 text-safe"
+                          : "bg-paper-dark text-ink-soft"
+                      }`}
+                    >
+                      {step.status}
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-mono text-ink-soft mb-1.5 font-medium">
+                    {step.signal}
+                  </p>
+                  <p className="text-xs sm:text-sm text-ink-soft font-body leading-relaxed">
+                    {step.details}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Right: Structural Trail Diagram */}
+          <div className="lg:col-span-5 p-6 sm:p-8 rounded-sm bg-surface border border-line space-y-6 sticky top-24">
+            <div className="flex items-center justify-between text-xs font-mono pb-3 border-b border-line text-ink-soft">
+              <span className="font-bold text-ink uppercase tracking-wider">Topological Pipeline</span>
+              <span>Stage {activeStepIndex + 1} of 5</span>
+            </div>
+
+            <div className="font-mono text-xs space-y-3">
+              {/* Node 1 */}
+              <div className="p-3 bg-paper border border-line rounded-sm flex items-center justify-between">
+                <span className="font-bold text-ink">CUSTOMER (Aryan Sharma)</span>
+                <span className="text-[10px] text-safe font-bold">INITIATED ✓</span>
+              </div>
+              <div className="flex justify-center">
+                <ArrowDown className="w-3.5 h-3.5 text-ink-soft" />
+              </div>
+
+              {/* Node 2 */}
+              <div className="p-3 bg-paper border border-line rounded-sm flex items-center justify-between">
+                <span className="font-bold text-ink">CHECKOUT (Zenith Electronics)</span>
+                <span className="text-[10px] text-ink font-bold">₹4,999 RESERVED</span>
+              </div>
+              <div className="flex justify-center">
+                <ArrowDown className="w-3.5 h-3.5 text-ink-soft" />
+              </div>
+
+              {/* Node 3 */}
+              <div className="p-3 bg-paper border border-line rounded-sm flex items-center justify-between">
+                <span className="font-bold text-ink">PAYMENT ATTEMPT (UPI Rail)</span>
+                <span className="text-[10px] text-safe font-bold">DEBIT CONFIRMED</span>
+              </div>
+              <div className="flex justify-center">
+                <ArrowDown className="w-3.5 h-3.5 text-signal" />
+              </div>
+
+              {/* Node 4 (Branch) */}
+              <div className="p-3 bg-surface border border-signal rounded-sm space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-signal">BANK SWITCH DELAY</span>
+                  <span className="text-[10px] bg-signal/15 text-signal font-bold px-1.5 py-0.5 rounded-sm">
+                    CALLBACK TIMEOUT
+                  </span>
+                </div>
+                <p className="text-[11px] text-ink-soft font-body leading-snug">
+                  Customer account debited; webhook response held in bank queue.
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <ArrowDown className="w-3.5 h-3.5 text-safe" />
+              </div>
+
+              {/* Node 5 (SAFRA Action) */}
+              <div className="p-3 bg-paper border border-safe rounded-sm space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-safe">SAFRA BOUNDED ACTION</span>
+                  <span className="text-[10px] bg-safe/15 text-safe font-bold px-1.5 py-0.5 rounded-sm">
+                    WAIT (0 DUPES)
+                  </span>
+                </div>
+                <p className="text-[11px] text-ink-soft font-body leading-snug">
+                  Automatic resolution confirmed upon webhook retry.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

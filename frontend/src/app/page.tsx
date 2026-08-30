@@ -14,35 +14,35 @@ import Footer from "@/components/landing/Footer";
 
 export default function LandingPage() {
   return (
-    <div className="w-full bg-[#E9E8E2] text-[#192837] min-h-screen">
-      {/* 1. Header Navbar */}
+    <div className="w-full bg-paper text-ink min-h-screen font-body antialiased">
+      {/* 1. Publication Masthead Navbar */}
       <Navbar />
 
-      {/* 2. Editorial Hero with Atmospheric Background Video */}
+      {/* 2. Opening Hero & Live Transaction Tape */}
       <Hero />
 
-      {/* 3. Section 1 — The Flow (#flow) */}
+      {/* 3. 01 / The Trail Pipeline (#flow) */}
       <TheFlow />
 
-      {/* 4. Section 2 — Signals & Working Dynamic Filters (#signals) */}
+      {/* 4. 02 / Signals & Investigation Ledger (#signals) */}
       <Signals />
 
-      {/* 5. Section 3 — Recovery Simulator with Real Execution & Groq Reasoning (#recovery) */}
+      {/* 5. 03 / Recovery Simulator & SAFRA Note (#recovery) */}
       <RecoverySimulator />
 
-      {/* 6. Section 4 — The Graph (#graph) */}
+      {/* 6. 04 / Transaction Trail Graph (#graph) */}
       <TheGraph />
 
-      {/* 7. Section 5 — Audit Trail: Why SAFRA Acted (#about) */}
+      {/* 7. 05 / Audit Trail Terminal Report (#about) */}
       <AuditTrail />
 
-      {/* 8. Section 6 — Batch Verification & Baseline Comparison */}
+      {/* 8. 06 / Batch Proof & Baseline Comparison (#batch) */}
       <BatchSimulation />
 
-      {/* 9. Final Typographic CTA */}
+      {/* 9. Conclusion Statement */}
       <FinalCta />
 
-      {/* 10. Minimal Footer */}
+      {/* 10. Publication Footer */}
       <Footer />
     </div>
   );

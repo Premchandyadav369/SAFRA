@@ -1,41 +1,49 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { ArrowRightCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function FinalCta() {
-  const scrollToFlow = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const elem = document.getElementById("flow");
+  const scrollToSection = (id: string) => {
+    const elem = document.getElementById(id);
     if (elem) {
       elem.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <section className="py-28 px-5 sm:px-8 max-w-[1280px] mx-auto text-center border-t border-[#E2E8F0] bg-[#FFFFFF]">
-      <div className="max-w-[660px] mx-auto space-y-6">
-        <h2 className="font-heading text-3xl sm:text-5xl font-black text-[#0C2340] leading-[1.1]">
-          Some money is gone. <br />
-          Some is waiting to be found.
-        </h2>
+    <section className="py-24 sm:py-32 bg-ink text-paper border-t border-line">
+      <div className="max-w-[1320px] mx-auto px-6 sm:px-10">
+        <div className="max-w-[960px] space-y-6">
+          <div className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-signal">
+            ● CONCLUSION
+          </div>
 
-        <p className="text-base sm:text-lg text-[#334155] font-medium font-sans max-w-[520px] mx-auto">
-          Explore the simulated revenue recovery environment built for the Razorpay AI Buildathon.
-        </p>
+          <h2 className="font-display text-4xl sm:text-7xl font-bold tracking-[-0.04em] leading-[0.96]">
+            Some money is gone. <br />
+            Some is still waiting.
+          </h2>
 
-        <div className="pt-4 flex justify-center">
-          <motion.a
-            href="#flow"
-            onClick={scrollToFlow}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="min-w-[220px] px-7 py-4 rounded-full bg-[#0C8CE9] hover:bg-[#0274C6] text-white font-bold text-sm sm:text-base flex items-center justify-between gap-8 shadow-lg shadow-[#0C8CE9]/25 transition-all cursor-pointer inline-flex"
-          >
-            <span>Open SAFRA</span>
-            <ArrowRightCircle className="w-5 h-5" />
-          </motion.a>
+          <p className="font-display text-2xl sm:text-4xl text-paper/70 font-medium tracking-tight">
+            SAFRA exists to know the difference.
+          </p>
+
+          <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <button
+              onClick={() => scrollToSection("flow")}
+              className="px-8 py-4 bg-signal hover:bg-signal-dark text-paper text-xs font-display font-bold uppercase tracking-wider rounded-sm flex items-center justify-between gap-6 transition-colors cursor-pointer"
+            >
+              <span>OPEN THE INVESTIGATION</span>
+              <ArrowRight className="w-4 h-4 text-paper" />
+            </button>
+
+            <button
+              onClick={() => scrollToSection("recovery")}
+              className="px-6 py-4 border border-paper/20 hover:border-paper/60 text-paper text-xs font-mono font-semibold uppercase tracking-wider rounded-sm transition-colors"
+            >
+              TRY RECOVERY SIMULATOR
+            </button>
+          </div>
         </div>
       </div>
     </section>

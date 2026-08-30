@@ -1,29 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-@import url('https://db.onlinewebfonts.com/c/04e6981992c0e2e7642af2074ebe3901?family=Helvetica+Now+Display+Bold');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-heading: 'Helvetica Now Display Bold', 'Inter', -apple-system, sans-serif;
-  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-display: 'DM Sans', -apple-system, sans-serif;
+  --font-body: 'Manrope', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --color-text: #0C2340;
-  --color-text-muted: #475569;
-  --color-text-light: #64748B;
+  /* Ink & Paper Theme Tokens */
+  --ink: #121816;
+  --ink-soft: #4F5B56;
+  --paper: #F4F1EA;
+  --paper-dark: #EAE5DA;
+  --surface: #FFFCF5;
+  --line: #D7D2C8;
 
-  --color-razorpay-blue: #0C8CE9;
-  --color-accent: #525CEB;
-  --color-accent-purple: #7342E2;
+  /* Semantic Signal Tokens */
+  --signal: #E96B3D;
+  --signal-dark: #C84F27;
+  --safe: #2D7A61;
+  --warning: #C98B27;
+  --danger: #B94343;
 
-  --color-background: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-surface-soft: #F1F5F9;
-
-  --color-success: #00B386;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
+  --blue-ink: #29465B;
+  --muted: #8A918D;
 }
 
 * {
@@ -38,46 +40,52 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-body);
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(18, 24, 22, 0.035) 1px, transparent 1px);
+  background-size: 18px 18px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom minimal scrollbars */
+/* Custom minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: var(--paper);
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
+  background: var(--line);
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: var(--ink-soft);
 }
 
-/* React Flow high-contrast styling */
-.react-flow__attribution {
-  display: none !important;
+/* Text selections in Signal Orange */
+::selection {
+  background-color: var(--signal);
+  color: #FFFFFF;
 }
-.react-flow__controls {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08) !important;
+
+/* Ticker marquee animation */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
-.react-flow__controls button {
-  background: #FFFFFF !important;
-  border-bottom: 1px solid #E2E8F0 !important;
-  color: #0C2340 !important;
-  fill: #0C2340 !important;
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: ticker 35s linear infinite;
 }
-.react-flow__controls button:hover {
-  background: #F1F5F9 !important;
-  color: #0C8CE9 !important;
-  fill: #0C8CE9 !important;
+
+.animate-ticker:hover {
+  animation-play-state: paused;
 }
