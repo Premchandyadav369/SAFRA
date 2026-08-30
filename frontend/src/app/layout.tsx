@@ -1,12 +1,33 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@xyflow/react/dist/style.css";
-import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
 
 export const metadata: Metadata = {
-  title: "SAFRA — AI Financial Reality, Uncertainty & Recovery Engine",
-  description: "When money moves but certainty doesn't. We don't tell you a payment is pending. We tell you what is happening to your money.",
+  title: "SAFRA — Autonomous Revenue Recovery Intelligence | Razorpay AI Buildathon",
+  description: "Signal-Aware Financial Revenue Agent. Find revenue that's slipping away, diagnose root causes, and execute bounded recovery workflows with Gemma AI.",
+  keywords: [
+    "SAFRA",
+    "Razorpay AI Buildathon",
+    "Track 03",
+    "AI Revenue Recovery",
+    "Fintech AI",
+    "Gemma 3",
+    "Autonomous Payment Recovery",
+    "UPI Pending Resolution"
+  ],
+  authors: [{ name: "Premchand Yadav" }],
+  openGraph: {
+    title: "SAFRA — Autonomous Revenue Recovery Intelligence",
+    description: "Catch the ₹ slipping before it disappears. Autonomous revenue recovery engine for merchants.",
+    siteName: "SAFRA",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SAFRA — AI Revenue Recovery Intelligence",
+    description: "Find revenue that's slipping away and win it back with bounded AI workflows.",
+  },
 };
 
 export default function RootLayout({
@@ -15,15 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-background text-slate-100 flex flex-col font-sans">
-        <Navbar />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-            {children}
-          </main>
-        </div>
+    <html lang="en">
+      <body className="min-h-screen bg-[#F8FAFC] text-[#0C2340] antialiased selection:bg-[#0C8CE9] selection:text-white">
+        {children}
       </body>
     </html>
   );
