@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Activity } from "lucide-react";
 import SafraLogo from "./SafraLogo";
 
 export default function Navbar() {
@@ -21,7 +21,11 @@ export default function Navbar() {
           </Link>
 
           {/* Center Navigation without numbers */}
-          <nav className="hidden md:flex items-center gap-7 text-xs font-mono font-semibold tracking-wider text-ink-soft">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-mono font-semibold tracking-wider text-ink-soft">
+            <Link href="/lab" className="hover:text-signal transition-colors uppercase font-bold text-signal flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
+              <span>Lab</span>
+            </Link>
             <Link href="/#flow" className="hover:text-ink transition-colors uppercase">
               Trail
             </Link>
@@ -52,10 +56,10 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/methodology"
+              href="/lab"
               className="text-xs font-display font-bold px-4 py-2 bg-ink text-paper hover:bg-ink-soft transition-colors rounded-sm flex items-center gap-2"
             >
-              <span>RAZORPAY INTEGRATION</span>
+              <span>SIMULATION LAB</span>
               <ArrowRight className="w-3.5 h-3.5 text-signal" />
             </Link>
           </div>
@@ -87,6 +91,14 @@ export default function Navbar() {
           </div>
 
           <div className="flex flex-col gap-6 my-auto font-display text-2xl font-bold text-ink">
+            <Link
+              href="/lab"
+              onClick={() => setMobileOpen(false)}
+              className="hover:text-signal transition-colors flex items-center justify-between border-b border-line/60 pb-3 text-signal"
+            >
+              <span>Simulation Lab</span>
+              <ArrowRight className="w-5 h-5 text-signal" />
+            </Link>
             <Link
               href="/#flow"
               onClick={() => setMobileOpen(false)}
@@ -130,7 +142,7 @@ export default function Navbar() {
             <Link
               href="/methodology"
               onClick={() => setMobileOpen(false)}
-              className="hover:text-signal transition-colors flex items-center justify-between border-b border-line/60 pb-3 text-signal"
+              className="hover:text-signal transition-colors flex items-center justify-between border-b border-line/60 pb-3"
             >
               <span>End-to-End Methodology</span>
               <ArrowRight className="w-5 h-5 text-signal" />
@@ -139,11 +151,11 @@ export default function Navbar() {
 
           <div className="pt-6 border-t border-line">
             <Link
-              href="/methodology"
+              href="/lab"
               onClick={() => setMobileOpen(false)}
               className="w-full py-3.5 bg-ink text-paper text-sm font-display font-bold flex items-center justify-center gap-2 rounded-sm"
             >
-              <span>VIEW RAZORPAY INTEGRATION</span>
+              <span>OPEN SIMULATION LAB</span>
               <ArrowRight className="w-4 h-4 text-signal" />
             </Link>
           </div>

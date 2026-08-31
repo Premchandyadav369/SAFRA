@@ -12,7 +12,10 @@ from app.database.models.track03 import (
     AuditEvent,
     BatchRun,
     AIExplanation,
-    BarrierInterception
+    BarrierInterception,
+    SimulationSession,
+    InvestigationNote,
+    DatasetImportLog
 )
 
 __all__ = [
@@ -32,5 +35,8 @@ __all__ = [
     "AuditEvent",
     "BatchRun",
     "AIExplanation",
-    "BarrierInterception"
+    "BarrierInterception",
+    "SimulationSession",
+    "InvestigationNote",
+    "DatasetImportLog"
 ]

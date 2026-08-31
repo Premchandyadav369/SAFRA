@@ -31,6 +31,7 @@ class Transaction(Base):
     estimated_recovery_value = Column(Float, default=0.0)
     recommended_action = Column(String(128), default="WAIT")
     actual_outcome = Column(String(64), default="RECOVERED")
+    latency_ms = Column(Integer, default=180)
     signals = Column(JSON, default=list)
 
     # Relationships
@@ -122,3 +123,41 @@ class AIExplanation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     transaction = relationship("Transaction", back_populates="ai_explanations")
+
+
+class SimulationSession(Base):
+    __tablename__ = "simulation_sessions"
+
+    id = Column(String(64), primary_key=True, index=True)
+    session_name = Column(String(128), default="SESSION_DEFAULT")
+    scenario_type = Column(String(64), default="NORMAL")
+    event_count = Column(Integer, default=0)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    ended_at = Column(DateTime, nullable=True)
+    configuration = Column(JSON, default=dict)
+    event_log = Column(JSON, default=list)
+
+
+class InvestigationNote(Base):
+    __tablename__ = "investigation_notes"
+
+    id = Column(String(64), primary_key=True, index=True)
+    title = Column(String(256), nullable=False)
+    hypothesis = Column(Text, nullable=False)
+    author = Column(String(128), default="Risk Analyst")
+    attached_filters = Column(JSON, default=dict)
+    graph_snapshot = Column(JSON, default=dict)
+    ai_summary = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class DatasetImportLog(Base):
+    __tablename__ = "dataset_import_logs"
+
+    id = Column(String(64), primary_key=True, index=True)
+    filename = Column(String(256), nullable=False)
+    records_received = Column(Integer, default=0)
+    valid_records = Column(Integer, default=0)
+    rejected_records = Column(Integer, default=0)
+    rejection_reasons = Column(JSON, default=list)
+    created_at = Column(DateTime, default=datetime.utcnow)

@@ -28,7 +28,34 @@ Traditional payment systems treat `PENDING` or `FAILED` as static dead ends or b
 
 ---
 
-## 📐 2. JAX-Style Differentiable Mathematical Formulation
+## 🧪 2. Simulated Payment Intelligence Lab (`/lab`)
+
+SAFRA behaves as a **miniature payment operations and recovery laboratory**, simulating live digital payment lifecycles and continuously streaming events:
+
+```
+CUSTOMER ──► CHECKOUT ──► PAYMENT INITIATED ──► PAYMENT RAIL ──► BANK / PSP RESPONSE
+                                                                          │
+┌───────────────────────────────┬─────────────────────────────────────────┘
+│                               │
+▼ (SUCCESS / RECOVERED)         ▼ (PENDING / FAILED)
+COMPLETED SETTLEMENT            SAFRA RISK ANALYSIS & BOUNDED ACTION
+                                        │
+                                ┌───────┴───────┬───────────────┐
+                                ▼               ▼               ▼
+                        WAIT (5m)       SMART RECOVERY LINK    STOP (FATIGUE)
+```
+
+### Key Capabilities in the Simulation Lab:
+1. **8 Realistic Payment Rails:** `UPI`, `CREDIT_CARD`, `DEBIT_CARD`, `NETBANKING`, `WALLET`, `BANK_TRANSFER`, `SUBSCRIPTION`, `INVOICE`.
+2. **6 Provider Simulation Profiles:** `HDFC` (650ms), `ICICI` (490ms), `SBI` (810ms), `Axis` (540ms), `Kotak` (510ms), `Yes Bank` (590ms).
+3. **Dynamic Traffic Patterns:** `NORMAL`, `PAYDAY_SURGE` (3.5x), `FLASH_SALE` (5.0x), `BANK_OUTAGE` (HDFC 1,850ms CBS Timeout), `UPI_DEGRADATION`, `HIGH_ABANDONMENT`.
+4. **CSV Export & Import Suite with Validation Reports:** Download verified records (`/api/dataset/export/transactions.csv`) and upload historical datasets with rejected-row reporting.
+5. **Investigation Notebook:** Save observations, attach graph snapshots, and export compliance dossiers (`NOTE #...`).
+6. **Scripted 3-Minute Buildathon Demo:** One-click automated pitch demonstration from baseline to surge, outage, barrier engagement, and recovery clearing.
+
+---
+
+## 📐 3. JAX-Style Differentiable Mathematical Formulation
 
 SAFRA models the revenue recovery problem as a constrained Markov Decision Process (MDP) with a differentiable parameterized scoring function:
 
@@ -51,7 +78,7 @@ N_{\text{retries}} \ge 3 \lor \hat{P}_\theta < 0.20 \implies a^* = \text{STOP}
 
 ---
 
-## 🔐 3. Cryptographic Primitives & Verifiable Merkle DAG
+## 🔐 4. Cryptographic Primitives & Verifiable Merkle DAG
 
 SAFRA provides mathematical proof of zero duplicate charges and tamper-evident auditability:
 
@@ -82,12 +109,12 @@ SAFRA provides mathematical proof of zero duplicate charges and tamper-evident a
 
 ---
 
-## 🏗️ 4. High-Level System Architecture
+## 🏗️ 5. High-Level System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           TRANSACTION EVENT STREAM                          │
-│               (500 Synthetic Deterministic Records: 85% INR / 15% USD)      │
+│                     SIMULATED PAYMENT EVENT ENGINE                          │
+│          (8 Rails: UPI, Cards, NetBanking, Subscriptions, Invoices)         │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │
                                        ▼
@@ -123,6 +150,7 @@ SAFRA provides mathematical proof of zero duplicate charges and tamper-evident a
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                       SAFRA FRONTEND (NEXT.JS 14 / VERCEL)                  │
 │                                                                             │
+│  • Simulated Payment Intelligence Lab (/lab) with Dynamic Recharts         │
 │  • Editorial Investigation Canvas (DM Sans + Manrope + JetBrains Mono)     │
 │  • Interactive Chaos Sandbox with Sliders & Web Audio Feedback              │
 │  • 10-Node Relational Topology Network Graph with Path Tracing              │
@@ -132,7 +160,7 @@ SAFRA provides mathematical proof of zero duplicate charges and tamper-evident a
 
 ---
 
-## 📊 5. Batch Verification & Benchmark Proof
+## 📊 6. Batch Verification & Benchmark Proof
 
 Tested on a benchmark batch of 500 heterogeneous transactions (₹45.7L total revenue at risk):
 
@@ -146,7 +174,7 @@ Tested on a benchmark batch of 500 heterogeneous transactions (₹45.7L total re
 
 ---
 
-## 🌐 6. Deployment & Production Setup
+## 🌐 7. Deployment & Production Setup
 
 ### Deploy Frontend to Vercel:
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPremchandyadav369%2FSAFRA&root-directory=frontend)
@@ -168,7 +196,7 @@ Tested on a benchmark batch of 500 heterogeneous transactions (₹45.7L total re
 
 ---
 
-## 🛠️ 7. Local Development & Testing
+## 🛠️ 8. Local Development & Testing
 
 ```bash
 # Clone the repository
@@ -180,7 +208,7 @@ cd backend
 pip install -r requirements.txt
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-# Run All 20 Pytest Unit, Crypto, and Integration Tests
+# Run All 24 Pytest Unit, Crypto, Recovery, and Lab Tests
 pytest tests/ -v
 
 # Frontend Setup

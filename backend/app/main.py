@@ -7,6 +7,7 @@ from app.database.session import engine, Base, AsyncSessionLocal
 from app.database import models
 from app.data.generate_dataset import seed_dataset_if_empty
 from app.api.websockets import ws_manager
+from app.services.simulation_engine import simulation_engine
 
 # Import API Routers
 from app.api.routes.recovery_flow import router as recovery_flow_router
@@ -19,6 +20,9 @@ from app.api.routes.recovery import router as recovery_router
 from app.api.routes.analytics import router as analytics_router
 from app.api.routes.simulator import router as simulator_router
 from app.api.routes.crypto_proofs import router as crypto_proofs_router
+from app.api.routes.dataset_lab import router as dataset_lab_router
+from app.api.routes.notebook import router as notebook_router
+from app.api.routes.live_lab import router as live_lab_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,12 +33,17 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     print("[SAFRA] Database schema verified.")
 
-    # 2. Seed 500-event realistic synthetic dataset
+    # 2. Seed realistic synthetic dataset
     async with AsyncSessionLocal() as session:
         await seed_dataset_if_empty(session)
 
+    # 3. Start Continuous Payment Simulation Engine in background
+    sim_task = asyncio.create_task(simulation_engine.run_loop())
+
     yield
     print("[SAFRA] Shutting down SAFRA services...")
+    simulation_engine.is_running = False
+    sim_task.cancel()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -63,6 +72,9 @@ app.include_router(recovery_router, prefix=settings.API_PREFIX)
 app.include_router(analytics_router, prefix=settings.API_PREFIX)
 app.include_router(simulator_router, prefix=settings.API_PREFIX)
 app.include_router(crypto_proofs_router, prefix=settings.API_PREFIX)
+app.include_router(dataset_lab_router, prefix=settings.API_PREFIX)
+app.include_router(notebook_router, prefix=settings.API_PREFIX)
+app.include_router(live_lab_router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():
@@ -72,6 +84,7 @@ async def root():
         "competition": "Razorpay AI Buildathon",
         "tagline": settings.PROJECT_TAGLINE,
         "version": settings.VERSION,
+        "environment": "SIMULATED PAYMENT INTELLIGENCE LAB",
         "status": "OPERATIONAL",
         "docs_url": "/docs"
     }
@@ -80,13 +93,17 @@ async def root():
 async def health_check():
     return {
         "status": "HEALTHY",
-        "engine": "SAFRA",
-        "ai_model": settings.HF_MODEL_ID,
+        "simulator": "HEALTHY",
+        "api": "HEALTHY",
         "database": "CONNECTED",
-        "cryptography": "HMAC-SHA256-Merkle-Active"
+        "ai_model": settings.HF_MODEL_ID,
+        "cryptography": "HMAC-SHA256-Merkle-Active",
+        "websocket": "LIVE",
+        "environment": "SIMULATED PAYMENT ENVIRONMENT"
     }
 
 @app.websocket("/ws")
+@app.websocket("/ws/live-stream")
 async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:
