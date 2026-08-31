@@ -56,11 +56,11 @@ AUTHORIZATION ──► PROCESSING ──► OUTCOME:
 ## ⚙️ 3. Core Large-Scale Simulation Capabilities
 
 ### A. 5 Simulation Scale Levels:
-1. **LEVEL 1 — DEMO:** 100 to 1,000 payments (2 to 5 minutes) for pitch demonstrations.
-2. **LEVEL 2 — MERCHANT DAY:** 10,000 to 50,000 payments modeling a busy merchant day.
-3. **LEVEL 3 — HIGH VOLUME:** 100,000 to 500,000 payments for throughput benchmarking.
-4. **LEVEL 4 — STRESS TEST:** 1,000,000+ simulated payment events using event batching (`EVENT_BATCH`).
-5. **LEVEL 5 — INCIDENT MODE:** 50,000 payments/min under cascading shocks.
+1. **LEVEL 1 - DEMO:** 100 to 1,000 payments (2 to 5 minutes) for pitch demonstrations.
+2. **LEVEL 2 - MERCHANT DAY:** 10,000 to 50,000 payments modeling a busy merchant day.
+3. **LEVEL 3 - HIGH VOLUME:** 100,000 to 500,000 payments for throughput benchmarking.
+4. **LEVEL 4 - STRESS TEST:** 1,000,000+ simulated payment events using event batching (`EVENT_BATCH`).
+5. **LEVEL 5 - INCIDENT MODE:** 50,000 payments/min under cascading shocks.
 
 ### B. Virtual Time Engine ($1\times$ to $1000\times$):
 - Decouples simulation time ($t_{\text{sim}}$) from wall-clock time (`▶ PLAY`, `Ⅱ PAUSE`, `■ RESET`, `↻ STEP`).
