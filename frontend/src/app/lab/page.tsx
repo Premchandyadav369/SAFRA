@@ -16,6 +16,7 @@ import {
   Play,
   Pause,
   RotateCcw,
+  FastForward,
   CheckCircle2,
   TrendingUp,
   Cpu,
@@ -27,6 +28,12 @@ import {
   RefreshCw,
   Search,
   Check,
+  Copy,
+  BarChart3,
+  HelpCircle,
+  Zap,
+  Crosshair,
+  GitBranch,
   X
 } from "lucide-react";
 import {
@@ -46,1046 +53,1007 @@ import {
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
-export default function PaymentIntelligenceLab() {
-  // Connection & Freshness States
-  const [connectionStatus, setConnectionStatus] = useState<"LIVE" | "RECONNECTING" | "OFFLINE">("LIVE");
-  const [lastEventTime, setLastEventTime] = useState<string>("0.4s ago");
-  const [eventCount, setEventCount] = useState<number>(1420);
+export default function LargeScaleSimulationControlRoom() {
+  // Virtual Time & PRNG Engine States
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [virtualSpeed, setVirtualSpeed] = useState<number>(1.0);
+  const [simTime, setSimTime] = useState<string>("09:15:32");
+  const [simulationSeed, setSimulationSeed] = useState<string>("SAFRA-2026-DEMO");
+  const [seedCopied, setSeedCopied] = useState<boolean>(false);
+  const [scaleLevel, setScaleLevel] = useState<string>("LEVEL_1_DEMO");
+  const [merchantProfile, setMerchantProfile] = useState<string>("DIGITAL_COMMERCE");
+  const [activeScenario, setActiveScenario] = useState<string>("NORMAL");
 
-  // Dynamic Live KPIs (populated from live simulation engine)
-  const [kpis, setKpis] = useState<any>({
-    total_transactions: 1420,
-    total_gmv_inr: 8420000,
-    success_rate_pct: 88.4,
-    failure_rate_pct: 11.6,
-    revenue_at_risk_inr: 842300,
-    recovered_revenue_inr: 684200,
-    recovery_rate_pct: 81.2,
-    active_interventions: 142,
-    stopped_interventions: 38,
-    duplicates_blocked: 194,
-    traffic_pattern: "NORMAL",
-    traffic_multiplier: 1.0,
-    bank_latencies: {
-      HDFC: 650,
-      ICICI: 490,
-      SBI: 810,
-      Axis: 540,
-      Kotak: 510,
-      "Yes Bank": 590
-    },
-    failure_distribution: {
-      BANK_TIMEOUT: 64,
-      INSUFFICIENT_FUNDS: 28,
-      USER_ABANDONED: 42,
-      OTP_FAILED: 34,
-      NETWORK_ERROR: 18,
-      MANDATE_FAILED: 12
-    },
-    status_distribution: {
-      SUCCESS: 1256,
-      PENDING: 88,
-      FAILED: 76,
-      RECOVERED: 142
-    },
-    throughput_series: [
-      { time: "10:00", throughput_per_min: 52, at_risk_inr: 140000 },
-      { time: "10:05", throughput_per_min: 68, at_risk_inr: 220000 },
-      { time: "10:10", throughput_per_min: 84, at_risk_inr: 340000 },
-      { time: "10:15", throughput_per_min: 120, at_risk_inr: 580000 },
-      { time: "10:20", throughput_per_min: 96, at_risk_inr: 420000 },
-      { time: "10:25", throughput_per_min: 78, at_risk_inr: 290000 },
-      { time: "10:30", throughput_per_min: 85, at_risk_inr: 310000 }
-    ],
+  // Dynamic Telemetry State
+  const [telemetry, setTelemetry] = useState<any>({
+    total_events_processed: 84218,
+    total_gmv_inr: 49820000.0,
+    success_rate_pct: 88.6,
+    revenue_at_risk_inr: 1420500.0,
+    recovered_revenue_inr: 1198400.0,
+    recovery_rate_pct: 84.3,
+    duplicates_prevented: 1248,
+    interventions_executed: 894,
+    failed_queue_length: 42,
     recent_events: [
-      { timestamp: "10:31:02.183", event_type: "PAYMENT_CREATED", stage: "CHECKOUT", details: "Payment intent created on Zenith Corp (₹4,999)" },
-      { timestamp: "10:31:02.611", event_type: "PAYMENT_PENDING", stage: "OUTCOME", details: "HDFC CBS timeout: 1,420ms delay" },
-      { timestamp: "10:31:03.027", event_type: "BARRIER_INTERCEPTED", stage: "GUARDIAN", details: "Blocked duplicate repayment retry on cus_9214" }
+      { sim_time: "09:15:28", transaction_id: "txn_842194", status: "SUCCESS", amount: 4999, payment_method: "UPI", bank: "HDFC" },
+      { sim_time: "09:15:29", transaction_id: "txn_842195", status: "PENDING", amount: 14500, payment_method: "CREDIT_CARD", bank: "ICICI" },
+      { sim_time: "09:15:31", transaction_id: "txn_842196", status: "FAILED", amount: 2800, payment_method: "UPI", bank: "SBI" }
     ]
   });
 
-  // Scenario Lab States
-  const [selectedScenario, setSelectedScenario] = useState<string>("NORMAL");
-  const [trafficMultiplier, setTrafficMultiplier] = useState<number>(1.0);
-  const [bankLatencyOverride, setBankLatencyOverride] = useState<number>(650);
-  const [scenarioHypothesis, setScenarioHypothesis] = useState<string>(
-    "System operating within nominal baseline parameters across all 8 payment rails."
-  );
-  const [aiConfidence, setAiConfidence] = useState<number>(0.98);
-  const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
-  const [demoPhase, setDemoPhase] = useState<string>("IDLE");
+  // Anomaly Detection & Root Cause State
+  const [anomalyData, setAnomalyData] = useState<any>({
+    anomaly_detected: false,
+    z_latency: 0.84,
+    current_ewma_latency: 560.0,
+    ranked_hypotheses: [
+      {
+        rank: 1,
+        title: "Nominal Baseline Payment Operation",
+        confidence_score: 0.98,
+        evidence: [
+          "All provider switches responding within SLA boundaries (< 800ms)",
+          "Timeout and failure rates within standard 95% confidence intervals"
+        ],
+        recommended_action: "STANDARD_MONITORING"
+      }
+    ]
+  });
 
-  // Export / Import States
-  const [exportModalOpen, setExportModalOpen] = useState<boolean>(false);
-  const [importModalOpen, setImportModalOpen] = useState<boolean>(false);
-  const [importReport, setImportReport] = useState<any>(null);
-  const [isImporting, setIsImporting] = useState<boolean>(false);
+  // Recovery Queue Prioritizer State
+  const [maxInterventions, setMaxInterventions] = useState<number>(500);
+  const [recoveryBudget, setRecoveryBudget] = useState<number>(50000);
+  const [prioritizedQueue, setPrioritizedQueue] = useState<any>({
+    allocated_count: 38,
+    wait_count: 14,
+    stopped_fatigue_count: 6,
+    unviable_count: 4,
+    total_intervention_cost_inr: 1596.0,
+    total_expected_recovery_inr: 184200.0,
+    expected_net_roi_multiple: 115.4,
+    top_allocated_actions: [
+      { rank: 1, transaction_id: "txn_84210", amount: 84200, recovery_probability: 0.88, priority_score: 65200, decision: "EXECUTE_OPTIMAL_INTERVENTION" },
+      { rank: 2, transaction_id: "txn_84211", amount: 62500, recovery_probability: 0.74, priority_score: 41600, decision: "EXECUTE_OPTIMAL_INTERVENTION" },
+      { rank: 3, transaction_id: "txn_84212", amount: 28000, recovery_probability: 0.82, priority_score: 21800, decision: "EXECUTE_OPTIMAL_INTERVENTION" }
+    ]
+  });
 
-  // Notebook States
-  const [notebookModalOpen, setNotebookModalOpen] = useState<boolean>(false);
-  const [noteTitle, setNoteTitle] = useState<string>("");
-  const [noteHypothesis, setNoteHypothesis] = useState<string>("");
-  const [notesList, setNotesList] = useState<any[]>([
-    {
-      id: "NOTE-014",
-      title: "HDFC UPI Latency Spike vs Ingestion Queue Congestion",
-      hypothesis: "HDFC CBS timeout spike to 1,420ms correlates directly with 5.0x payday checkout traffic surge. Immediate retries cause duplicate debit collisions.",
-      author: "Senior Payment Reliability Engineer",
-      created_at: "2026-08-31 09:15:00"
-    }
-  ]);
+  // Multi-Strategy Comparison State
+  const [strategyReport, setStrategyReport] = useState<any>(null);
 
-  // Strategy Sandbox States
-  const [sandboxAmount, setSandboxAmount] = useState<number>(4999);
-  const [selectedStrategy, setSelectedStrategy] = useState<string>("WAIT");
-  const [messagesSent, setMessagesSent] = useState<number>(1);
-  const [retryCount, setRetryCount] = useState<number>(1);
-  const [minutesSinceLast, setMinutesSinceLast] = useState<number>(12);
+  // Monte Carlo Experiment State
+  const [monteCarloReport, setMonteCarloReport] = useState<any>(null);
+  const [isMonteCarloRunning, setIsMonteCarloRunning] = useState<boolean>(false);
 
-  // Poll live backend lab status every 3 seconds for continuous updates
+  // Flagship ₹10 Crore Day State
+  const [flagshipActive, setFlagshipActive] = useState<boolean>(false);
+  const [flagshipStageIndex, setFlagshipStageIndex] = useState<number>(0);
+  const [flagshipData, setFlagshipData] = useState<any>(null);
+
+  // Modals
+  const [incidentModalOpen, setIncidentModalOpen] = useState<boolean>(false);
+  const [assumptionsModalOpen, setAssumptionsModalOpen] = useState<boolean>(false);
+  const [incidentType, setIncidentType] = useState<string>("BANK_LATENCY_DEGRADATION");
+  const [incidentSeverity, setIncidentSeverity] = useState<number>(0.65);
+  const [incidentDuration, setIncidentDuration] = useState<number>(10);
+  const [incidentTargetProvider, setIncidentTargetProvider] = useState<string>("HDFC");
+
+  // Fetch telemetry continuously every 2 seconds
   useEffect(() => {
     let timer: any;
     const fetchStatus = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/lab/status");
+        const res = await fetch("http://localhost:8000/api/simulation/status");
         if (res.ok) {
           const data = await res.json();
-          setKpis(data.kpis);
-          setConnectionStatus("LIVE");
-          setLastEventTime("0.6s ago");
-          setEventCount((prev) => prev + 1);
-          if (data.scripted_demo_phase && data.scripted_demo_phase !== "IDLE") {
-            setDemoPhase(data.scripted_demo_phase);
-          }
-        } else {
-          setConnectionStatus("RECONNECTING");
+          setTelemetry(data);
+          setSimTime(data.sim_time);
+          setIsPlaying(data.is_playing);
         }
       } catch {
-        setConnectionStatus("LIVE"); // resilient fallback
+        // Fallback simulation tick in UI
+        setSimTime((prev) => {
+          const parts = prev.split(":").map(Number);
+          let s = parts[2] + Math.round(virtualSpeed);
+          let m = parts[1];
+          let h = parts[0];
+          if (s >= 60) {
+            m += Math.floor(s / 60);
+            s %= 60;
+          }
+          if (m >= 60) {
+            h += Math.floor(m / 60);
+            m %= 60;
+          }
+          return `${String(h % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        });
       }
     };
 
     fetchStatus();
-    timer = setInterval(fetchStatus, 3000);
+    timer = setInterval(fetchStatus, 2000);
     return () => clearInterval(timer);
-  }, []);
+  }, [virtualSpeed]);
 
-  const handleScenarioTrigger = async (scName: string) => {
-    setSelectedScenario(scName);
+  // Handle Simulation Controls
+  const handleControlAction = async (action: string) => {
     try {
-      const res = await fetch("http://localhost:8000/api/lab/scenario/trigger", {
+      await fetch("http://localhost:8000/api/simulation/control", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+      if (action === "PLAY") setIsPlaying(true);
+      if (action === "PAUSE") setIsPlaying(false);
+      if (action === "RESET") {
+        setTelemetry((prev: any) => ({ ...prev, total_events_processed: 0, total_gmv_inr: 0 }));
+      }
+    } catch {
+      if (action === "PLAY") setIsPlaying(true);
+      if (action === "PAUSE") setIsPlaying(false);
+    }
+  };
+
+  const handleSpeedChange = async (speed: number) => {
+    setVirtualSpeed(speed);
+    try {
+      await fetch("http://localhost:8000/api/simulation/speed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ speed })
+      });
+    } catch {}
+  };
+
+  const handleScaleChange = async (scale: string) => {
+    setScaleLevel(scale);
+    try {
+      await fetch("http://localhost:8000/api/simulation/scale", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scale })
+      });
+    } catch {}
+  };
+
+  const handleMerchantChange = async (profile: string) => {
+    setMerchantProfile(profile);
+    try {
+      await fetch("http://localhost:8000/api/simulation/merchant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ merchant_profile: profile })
+      });
+    } catch {}
+  };
+
+  const handleScenarioSelect = async (scKey: string) => {
+    setActiveScenario(scKey);
+    try {
+      await fetch(`http://localhost:8000/api/simulation/scenario/select?scenario_key=${scKey}`, {
+        method: "POST"
+      });
+    } catch {}
+  };
+
+  const handleSeedReplay = async () => {
+    try {
+      await fetch("http://localhost:8000/api/simulation/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seed: simulationSeed })
+      });
+    } catch {}
+  };
+
+  const handleCopySeed = () => {
+    navigator.clipboard.writeText(simulationSeed);
+    setSeedCopied(true);
+    setTimeout(() => setSeedCopied(false), 2000);
+  };
+
+  const handleInjectIncident = async () => {
+    try {
+      await fetch("http://localhost:8000/api/simulation/incident/inject", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          scenario: scName,
-          traffic_multiplier: trafficMultiplier,
-          bank_latency_ms: bankLatencyOverride
+          incident_type: incidentType,
+          severity: incidentSeverity,
+          duration_minutes: incidentDuration,
+          target_provider: incidentTargetProvider
+        })
+      });
+    } catch {}
+    setIncidentModalOpen(false);
+  };
+
+  const handlePrioritizeQueue = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/simulation/prioritize-queue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          max_interventions_per_min: maxInterventions,
+          recovery_budget_inr: recoveryBudget
         })
       });
       if (res.ok) {
         const data = await res.json();
-        setScenarioHypothesis(data.root_cause_hypothesis);
-        setAiConfidence(data.ai_confidence);
+        setPrioritizedQueue(data);
       }
-    } catch {
-      // Local fallback
-      if (scName === "BANK_OUTAGE") {
-        setScenarioHypothesis(
-          "Failure concentration increased around provider HDFC Bank. CBS timeout rate is 4.2x above baseline. SAFRA policy automatically engaged WAIT barrier to suppress immediate retries and prevent double charges."
-        );
-        setAiConfidence(0.94);
-      } else if (scName === "UPI_DEGRADATION") {
-        setScenarioHypothesis(
-          "NPCI UPI transit rail acknowledgment delay detected. Callback latency increased to 1,400ms across 5 providers. SAFRA policy routing high-value checkout intents to alternate payment methods."
-        );
-        setAiConfidence(0.89);
-      } else {
-        setScenarioHypothesis("System operating within nominal baseline parameters across all 8 payment rails.");
-        setAiConfidence(0.98);
-      }
-    }
+    } catch {}
   };
 
-  const handleStartBuildathonDemo = async () => {
-    setIsDemoRunning(true);
-    setDemoPhase("PHASE_1_NORMAL");
+  const handleRunMultiStrategy = async () => {
     try {
-      await fetch("http://localhost:8000/api/lab/demo/start-script", { method: "POST" });
-    } catch {
-      // ignore
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsImporting(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("http://localhost:8000/api/dataset/import/transactions", {
-        method: "POST",
-        body: formData
+      const res = await fetch("http://localhost:8000/api/simulation/experiments/multi-strategy", {
+        method: "POST"
       });
-      const data = await res.json();
-      setImportReport(data);
+      if (res.ok) {
+        const data = await res.json();
+        setStrategyReport(data);
+      }
+    } catch {}
+  };
+
+  const handleRunMonteCarlo = async () => {
+    setIsMonteCarloRunning(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/simulation/experiments/monte-carlo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario: activeScenario, num_runs: 50 })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMonteCarloReport(data);
+      }
+    } catch {} finally {
+      setIsMonteCarloRunning(false);
+    }
+  };
+
+  const handleStartFlagship = async () => {
+    setFlagshipActive(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/simulation/flagship/10crore-day");
+      if (res.ok) {
+        const data = await res.json();
+        setFlagshipData(data);
+      }
     } catch {
-      setImportReport({
-        status: "VALIDATION_COMPLETED",
-        filename: file.name,
-        records_received: 5000,
-        valid_records_count: 4912,
-        rejected_records_count: 88,
-        rejection_reasons: [
-          "Row 42: Missing or invalid amount format",
-          "Row 118: Unknown payment rail: 'CRYPTO'",
-          "Row 310: Missing transaction_id",
-          "Row 402: Amount must be a positive number"
+      setFlagshipData({
+        scenario_name: "THE ₹10 CRORE PAYMENT DAY",
+        total_gmv_processed_inr: 100000000.0,
+        peak_revenue_at_risk_inr: 14250000.0,
+        baseline_recovery_yield_inr: 4820000.0,
+        safra_recovery_yield_inr: 11860000.0,
+        incremental_value_created_inr: 7040000.0,
+        duplicate_debits_prevented: 18420,
+        customer_spam_interventions_avoided: 42180,
+        timeline_stages: [
+          { sim_time: "09:00", title: "Morning Baseline Operation", status: "NORMAL", gmv_processed_inr: 8500000, revenue_at_risk_inr: 120000, hdfc_latency_ms: 620 },
+          { sim_time: "12:00", title: "Midday Traffic Surge", status: "SURGE", gmv_processed_inr: 28400000, revenue_at_risk_inr: 450000, hdfc_latency_ms: 780 },
+          { sim_time: "14:30", title: "HDFC Core Banking Switch Latency Degradation", status: "INCIDENT_START", gmv_processed_inr: 48200000, revenue_at_risk_inr: 3400000, hdfc_latency_ms: 1950 },
+          { sim_time: "15:00", title: "Revenue at Risk Escalation & Duplicate Retries", status: "CRITICAL_RISK", gmv_processed_inr: 54100000, revenue_at_risk_inr: 8900000, hdfc_latency_ms: 2450 },
+          { sim_time: "15:10", title: "SAFRA Deterministic Anomaly Detection Triggered", status: "SAFRA_DETECTED", gmv_processed_inr: 58600000, revenue_at_risk_inr: 10800000, hdfc_latency_ms: 2420 },
+          { sim_time: "15:15", title: "SAFRA Queue Reprioritization & WAIT Policy", status: "POLICY_ENGAGED", gmv_processed_inr: 62400000, revenue_at_risk_inr: 11500000, hdfc_latency_ms: 2380 },
+          { sim_time: "15:30", title: "Automated Revenue Recovery Acceleration", status: "RECOVERY_ACTIVE", gmv_processed_inr: 69800000, revenue_at_risk_inr: 7200000, hdfc_latency_ms: 2100 },
+          { sim_time: "17:00", title: "Bank Switch Recovery & System Stabilization", status: "STABILIZING", gmv_processed_inr: 81200000, revenue_at_risk_inr: 2100000, hdfc_latency_ms: 680 },
+          { sim_time: "23:59", title: "Day Complete — Comprehensive Impact Accounting", status: "COMPLETED", gmv_processed_inr: 100000000, revenue_at_risk_inr: 0, hdfc_latency_ms: 590 }
         ]
       });
-    } finally {
-      setIsImporting(false);
     }
   };
 
-  const handleSaveNote = async () => {
-    if (!noteTitle || !noteHypothesis) return;
-    const newNote = {
-      id: `NOTE-0${notesList.length + 14}`,
-      title: noteTitle,
-      hypothesis: noteHypothesis,
-      author: "Senior Risk Analyst",
-      created_at: new Date().toISOString().replace("T", " ").substring(0, 19)
-    };
-    setNotesList([newNote, ...notesList]);
-    setNoteTitle("");
-    setNoteHypothesis("");
-    setNotebookModalOpen(false);
-  };
-
-  // Fatigue calculation
-  const fatigueScore = Math.max(
-    0,
-    Math.min(100, Math.round(messagesSent * 22 + retryCount * 18 - Math.min(60, minutesSinceLast) * 0.4))
-  );
-
-  // Expected Net Value calculation
-  const recoveryProb = selectedStrategy === "WAIT" ? 0.88 : selectedStrategy === "RETRY_NOW" ? 0.32 : selectedStrategy === "SEND_RECOVERY_LINK" ? 0.74 : 0.05;
-  const interventionCost = selectedStrategy === "WAIT" ? 0.0 : selectedStrategy === "SEND_RECOVERY_LINK" ? 42.0 : 12.0;
-  const expectedGross = sandboxAmount * recoveryProb;
-  const expectedNet = Math.round(expectedGross - interventionCost);
-
-  // Failure reasons bar chart data
-  const failureBarData = [
-    { reason: "Bank Timeout", count: kpis.failure_distribution?.BANK_TIMEOUT || 64 },
-    { reason: "User Abandoned", count: kpis.failure_distribution?.USER_ABANDONED || 42 },
-    { reason: "OTP Drop", count: kpis.failure_distribution?.OTP_FAILED || 34 },
-    { reason: "Insufficient Funds", count: kpis.failure_distribution?.INSUFFICIENT_FUNDS || 28 },
-    { reason: "Network Error", count: kpis.failure_distribution?.NETWORK_ERROR || 18 },
-    { reason: "Mandate Failed", count: kpis.failure_distribution?.MANDATE_FAILED || 12 }
+  // 10 Predefined Incident Keys
+  const incidentList = [
+    { key: "PAYDAY_SURGE", label: "01. Payday Surge", desc: "3.8x Traffic Spike" },
+    { key: "FLASH_SALE", label: "02. Flash Sale", desc: "5.2x Checkout Rush" },
+    { key: "BANK_LATENCY_DEGRADATION", label: "03. Bank Latency", desc: "HDFC 2,400ms Spike" },
+    { key: "UPI_TIMEOUT_WAVE", label: "04. UPI Timeout", desc: "NPCI 504 Cluster" },
+    { key: "CARD_ISSUER_FAILURE", label: "05. Card Issuer Drop", desc: "3DS2 52% Rejection" },
+    { key: "NETWORK_PARTITION", label: "06. Partition", desc: "Out-of-Order Webhooks" },
+    { key: "RECOVERY_QUEUE_OVERLOAD", label: "07. Queue Overload", desc: "10k+ At-Risk Payments" },
+    { key: "MULTI_PROVIDER_INCIDENT", label: "08. Multi-Bank Outage", desc: "HDFC + SBI Correlated" },
+    { key: "CHECKOUT_ABANDONMENT_SPIKE", label: "09. 3DS2 Dropoff", desc: "48% Cart Abandonment" },
+    { key: "SILENT_REVENUE_LEAK", label: "10. Silent Leak", desc: "Subtle 8.5% Mandate Drop" },
+    { key: "BLACK_SWAN_MODE", label: "★ BLACK SWAN", desc: "Cascading Multi-Shock" }
   ];
-
-  // Bank latency comparison data
-  const latencyData = Object.entries(kpis.bank_latencies || {}).map(([bank, lat]) => ({
-    bank,
-    latency: lat,
-    sla: 800
-  }));
 
   return (
     <div className="min-h-screen bg-paper text-ink font-body antialiased">
       <Navbar />
 
-      <main className="max-w-[1360px] mx-auto px-6 sm:px-10 py-12 sm:py-16 space-y-12">
-        {/* Top Header & Environment Banner */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border-b border-line pb-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="px-2.5 py-1 rounded-sm bg-signal/15 text-signal font-mono text-[10px] font-bold tracking-widest uppercase border border-signal/30">
-                SIMULATED PAYMENT INTELLIGENCE LAB
-              </span>
-              <div className="flex items-center gap-2 font-mono text-xs">
-                <span
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm font-bold border ${
-                    connectionStatus === "LIVE"
-                      ? "bg-safe/15 text-safe border-safe/30"
-                      : "bg-warning/15 text-warning border-warning/30"
-                  }`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-safe animate-pulse" />
-                  {connectionStatus === "LIVE" ? "● LIVE STREAM" : "● RECONNECTING"}
-                </span>
-                <span className="text-muted text-[11px]">Last event: {lastEventTime}</span>
-              </div>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-bold font-display tracking-tight text-ink">
-              Production Simulation & Recovery Operations Lab
-            </h1>
-            <p className="text-xs sm:text-sm text-ink-soft font-mono">
-              Continuous asynchronous lifecycle generation across 8 rails with dynamic Recharts, scenario injection, and CSV import/export.
-            </p>
-          </div>
-
-          {/* Action Toolbar */}
-          <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
-            <button
-              onClick={() => setExportModalOpen(true)}
-              className="px-4 py-2.5 rounded-sm bg-surface border border-line hover:border-signal text-ink flex items-center gap-2 transition-colors font-semibold"
-            >
-              <Download className="w-4 h-4 text-signal" />
-              <span>Export CSV</span>
-            </button>
-
-            <button
-              onClick={() => setImportModalOpen(true)}
-              className="px-4 py-2.5 rounded-sm bg-surface border border-line hover:border-safe text-ink flex items-center gap-2 transition-colors font-semibold"
-            >
-              <Upload className="w-4 h-4 text-safe" />
-              <span>Import Dataset</span>
-            </button>
-
-            <button
-              onClick={() => setNotebookModalOpen(true)}
-              className="px-4 py-2.5 rounded-sm bg-surface border border-line hover:border-ink text-ink flex items-center gap-2 transition-colors font-semibold"
-            >
-              <BookOpen className="w-4 h-4 text-ink" />
-              <span>Investigation Notebook</span>
-            </button>
-
-            <button
-              onClick={handleStartBuildathonDemo}
-              className="px-5 py-2.5 rounded-sm bg-signal hover:bg-signal-dark text-paper font-display text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm"
-            >
-              <Sparkles className="w-4 h-4 text-paper" />
-              <span>3-Min Demo Script</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Scripted Demo Status Banner (if active) */}
-        {isDemoRunning && (
-          <div className="p-4 rounded-sm bg-signal/10 border border-signal text-ink font-mono text-xs flex items-center justify-between animate-in fade-in">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-signal animate-spin" />
-              <span className="font-bold text-signal uppercase">Buildathon Scripted Demo Active:</span>
-              <span>{demoPhase.replace(/_/g, " ")}</span>
-            </div>
-            <span className="text-[11px] text-ink-soft">Auto-progressing sequence...</span>
-          </div>
-        )}
-
-        {/* Live KPI Metric Cards (Non-Hardcoded Real-Time State) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Total GMV & Processed Payments */}
-          <div className="p-6 rounded-sm border border-line bg-surface space-y-3 shadow-sm">
-            <div className="flex items-center justify-between font-mono text-xs text-muted uppercase font-semibold">
-              <span>Total Volume (GMV)</span>
-              <Activity className="w-4 h-4 text-signal" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-bold font-display text-ink">
-                ₹{((kpis.total_gmv_inr || 8420000) / 100000).toFixed(1)}L
-              </span>
-              <span className="text-xs font-mono text-muted">INR</span>
-            </div>
-            <p className="text-xs text-ink-soft font-mono">
-              {kpis.total_transactions.toLocaleString("en-IN")} payments generated live
-            </p>
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-safe font-bold">
-              <span>Success Rate: {kpis.success_rate_pct}%</span>
-            </div>
-          </div>
-
-          {/* Card 2: Revenue at Risk Live Formula Counter */}
-          <div className="p-6 rounded-sm border border-danger/40 bg-surface space-y-3 shadow-sm">
-            <div className="flex items-center justify-between font-mono text-xs text-danger uppercase font-bold">
-              <span>Live Revenue at Risk</span>
-              <AlertTriangle className="w-4 h-4 text-danger" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-bold font-display text-danger">
-                ₹{(kpis.revenue_at_risk_inr || 842300).toLocaleString("en-IN")}
-              </span>
-            </div>
-            <p className="text-xs text-danger font-mono font-medium">
-              Formula: sum(amount) where status in (PENDING, FAILED)
-            </p>
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-danger font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-danger animate-pulse" />
-              <span>Pending & dropping checkouts</span>
-            </div>
-          </div>
-
-          {/* Card 3: Monotonically Increasing Recovered Revenue */}
-          <div className="p-6 rounded-sm border border-safe/40 bg-surface space-y-3 shadow-sm">
-            <div className="flex items-center justify-between font-mono text-xs text-safe uppercase font-bold">
-              <span>Recovered Revenue</span>
-              <ShieldCheck className="w-4 h-4 text-safe" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-bold font-display text-safe">
-                ₹{(kpis.recovered_revenue_inr || 684200).toLocaleString("en-IN")}
-              </span>
-            </div>
-            <p className="text-xs text-safe font-mono font-medium">
-              {kpis.active_interventions} bounded actions executed
-            </p>
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-safe font-bold">
-              <span>Recovery Rate: {kpis.recovery_rate_pct}%</span>
-            </div>
-          </div>
-
-          {/* Card 4: Duplicate Retries Prevented */}
-          <div className="p-6 rounded-sm border border-line bg-surface space-y-3 shadow-sm">
-            <div className="flex items-center justify-between font-mono text-xs text-muted uppercase font-semibold">
-              <span>Duplicates Blocked</span>
-              <ShieldAlert className="w-4 h-4 text-signal" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-bold font-display text-ink">
-                {kpis.duplicates_blocked || 194}
-              </span>
-              <span className="text-xs font-mono text-muted">retries</span>
-            </div>
-            <p className="text-xs text-ink-soft font-mono">
-              Sliding-window HMAC barrier active
-            </p>
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-safe font-semibold">
-              <span>0 duplicate debits permitted</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Section: Live Analytical Recharts (Rolling 30-min Throughput & Status Distribution) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Chart 1: Throughput & Revenue at Risk (8 Cols) */}
-          <div className="lg:col-span-8 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-line pb-4 font-mono">
-              <div>
-                <h2 className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-signal" />
-                  <span>Real-Time Payment Throughput & Risk (Rolling 30m)</span>
-                </h2>
-                <p className="text-[11px] text-ink-soft mt-0.5">
-                  Live payments generated per minute vs revenue accumulating under uncertainty.
-                </p>
-              </div>
-              <span className="text-[11px] font-bold text-safe">
-                Pattern: {kpis.traffic_pattern} ({kpis.traffic_multiplier}x)
-              </span>
-            </div>
-
-            <div className="h-[280px] w-full font-mono text-xs">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={kpis.throughput_series}>
-                  <defs>
-                    <linearGradient id="riskGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#E96B3D" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#E96B3D" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D7D2C8" />
-                  <XAxis dataKey="time" stroke="#121816" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#121816" tick={{ fontSize: 10 }} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#FFFCF5", borderColor: "#D7D2C8", fontSize: 11 }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="throughput_per_min"
-                    name="Payments / Min"
-                    stroke="#121816"
-                    strokeWidth={2}
-                    fill="#121816"
-                    fillOpacity={0.1}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="at_risk_inr"
-                    name="Revenue at Risk (₹)"
-                    stroke="#E96B3D"
-                    strokeWidth={2}
-                    fill="url(#riskGrad)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Chart 2: Rolling Bank Latency Comparison (4 Cols) */}
-          <div className="lg:col-span-4 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
-            <div className="border-b border-line pb-4 font-mono">
-              <h2 className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-signal" />
-                <span>Rolling Provider Latencies (ms)</span>
-              </h2>
-              <p className="text-[11px] text-ink-soft mt-0.5">
-                Simulated CBS switch delay across 6 banking endpoints.
-              </p>
-            </div>
-
-            <div className="h-[280px] w-full font-mono text-xs">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={latencyData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D7D2C8" />
-                  <XAxis type="number" stroke="#121816" tick={{ fontSize: 10 }} />
-                  <YAxis type="category" dataKey="bank" stroke="#121816" tick={{ fontSize: 10 }} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#FFFCF5", borderColor: "#D7D2C8", fontSize: 11 }}
-                  />
-                  <Bar dataKey="latency" name="Latency (ms)" fill="#E96B3D" radius={[0, 2, 2, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Section: Scenario Injection Lab with Parameter Controls */}
-        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line pb-4">
-            <div>
-              <div className="text-xs font-mono font-bold uppercase tracking-widest text-signal">
-                SCENARIO INJECTION LAB
-              </div>
-              <h2 className="text-2xl font-bold font-display text-ink tracking-tight">
-                Simulate Chaos Scenarios & Evaluate SAFRA Policy Response
-              </h2>
-            </div>
-
-            <span className="px-3 py-1 bg-paper border border-line text-ink font-mono text-xs font-semibold rounded-sm">
-              Active: {selectedScenario}
+      <main className="max-w-[1380px] mx-auto px-6 sm:px-10 py-12 sm:py-16 space-y-12">
+        {/* Environment Disclaimer Header */}
+        <div className="p-4 rounded-sm bg-signal/10 border border-signal/30 text-ink font-mono text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="px-2.5 py-1 rounded-sm bg-signal text-paper font-bold text-[10px] tracking-widest uppercase">
+              SIMULATED PAYMENT INTELLIGENCE ENVIRONMENT
+            </span>
+            <span className="text-[11px] text-ink-soft">
+              Deterministic, event-driven discrete simulation engine. Simulated statistics do not represent production bank data.
             </span>
           </div>
-
-          {/* Scenario Buttons Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono text-xs">
-            <button
-              onClick={() => handleScenarioTrigger("NORMAL")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "NORMAL"
-                  ? "border-safe bg-safe/10 font-bold text-safe"
-                  : "border-line bg-paper hover:border-ink-soft text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">NORMAL</div>
-              <p className="text-[10px] text-muted">1.0x Baseline Traffic</p>
-            </button>
-
-            <button
-              onClick={() => handleScenarioTrigger("PAYDAY_SURGE")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "PAYDAY_SURGE"
-                  ? "border-signal bg-signal/10 font-bold text-signal"
-                  : "border-line bg-paper hover:border-ink-soft text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">PAYDAY SURGE</div>
-              <p className="text-[10px] text-muted">3.5x Traffic Spike</p>
-            </button>
-
-            <button
-              onClick={() => handleScenarioTrigger("FLASH_SALE")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "FLASH_SALE"
-                  ? "border-signal bg-signal/10 font-bold text-signal"
-                  : "border-line bg-paper hover:border-ink-soft text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">FLASH SALE</div>
-              <p className="text-[10px] text-muted">5.0x Checkout Surge</p>
-            </button>
-
-            <button
-              onClick={() => handleScenarioTrigger("BANK_OUTAGE")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "BANK_OUTAGE"
-                  ? "border-danger bg-danger/10 font-bold text-danger"
-                  : "border-line bg-paper hover:border-danger text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">BANK OUTAGE</div>
-              <p className="text-[10px] text-muted">HDFC 1,850ms CBS Spike</p>
-            </button>
-
-            <button
-              onClick={() => handleScenarioTrigger("UPI_DEGRADATION")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "UPI_DEGRADATION"
-                  ? "border-warning bg-warning/10 font-bold text-warning"
-                  : "border-line bg-paper hover:border-warning text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">UPI DEGRADE</div>
-              <p className="text-[10px] text-muted">NPCI 1,400ms Delay</p>
-            </button>
-
-            <button
-              onClick={() => handleScenarioTrigger("HIGH_ABANDONMENT")}
-              className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
-                selectedScenario === "HIGH_ABANDONMENT"
-                  ? "border-warning bg-warning/10 font-bold text-warning"
-                  : "border-line bg-paper hover:border-warning text-ink"
-              }`}
-            >
-              <div className="font-bold text-[11px]">3DS2 DROP</div>
-              <p className="text-[10px] text-muted">High OTP Abandonment</p>
-            </button>
-          </div>
-
-          {/* Automated Root Cause Hypothesis Card */}
-          <div className="p-6 rounded-sm border border-signal/40 bg-paper space-y-3 font-mono text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-line">
-              <div className="flex items-center gap-2 text-signal font-bold uppercase">
-                <Sparkles className="w-4 h-4" />
-                <span>Automated Root Cause Hypothesis (Gemma AI Grounded)</span>
-              </div>
-              <span className="text-safe font-bold">Confidence: {(aiConfidence * 100).toFixed(0)}%</span>
-            </div>
-            <p className="text-sm text-ink leading-relaxed font-body font-medium">
-              {scenarioHypothesis}
-            </p>
-          </div>
+          <button
+            onClick={() => setAssumptionsModalOpen(true)}
+            className="text-signal hover:underline font-bold flex items-center gap-1.5 shrink-0"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>Simulation Assumptions</span>
+          </button>
         </div>
 
-        {/* Section: Isolated Recovery Strategy Sandbox & Customer Fatigue Model */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Strategy Comparison & Money Impact Calculator (7 Cols) */}
-          <div className="lg:col-span-7 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
-            <div className="border-b border-line pb-4">
-              <div className="text-xs font-mono font-bold uppercase tracking-widest text-signal">
-                BOUNDED RECOVERY SANDBOX
+        {/* Master Control Room Header & Virtual Clock */}
+        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-line">
+            <div className="space-y-1">
+              <div className="text-xs font-mono font-bold uppercase tracking-widest text-signal flex items-center gap-2">
+                <Radio className="w-4 h-4 text-signal animate-pulse" />
+                <span>LARGE-SCALE PAYMENT OPERATIONS CONTROL ROOM</span>
               </div>
-              <h2 className="text-xl font-bold font-display text-ink">
-                Compare Recovery Strategies on Individual Transaction
-              </h2>
-            </div>
-
-            {/* Transaction Amount Slider */}
-            <div className="space-y-2 font-mono text-xs">
-              <div className="flex justify-between text-ink">
-                <span>Transaction Value:</span>
-                <strong className="text-signal text-sm">₹{sandboxAmount.toLocaleString("en-IN")}</strong>
-              </div>
-              <input
-                type="range"
-                min="500"
-                max="50000"
-                step="500"
-                value={sandboxAmount}
-                onChange={(e) => setSandboxAmount(Number(e.target.value))}
-                className="w-full accent-signal"
-              />
-            </div>
-
-            {/* 4 Strategy Comparison Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-              <button
-                onClick={() => setSelectedStrategy("WAIT")}
-                className={`p-3 rounded-sm border text-left space-y-1 transition-all ${
-                  selectedStrategy === "WAIT"
-                    ? "border-safe bg-safe/10 text-safe font-bold"
-                    : "border-line bg-paper text-ink"
-                }`}
-              >
-                <div className="font-bold text-[11px]">WAIT (5m)</div>
-                <div className="text-[10px] text-safe font-bold">P(Recov): 88%</div>
-                <p className="text-[9px] text-muted">Cost: ₹0</p>
-              </button>
-
-              <button
-                onClick={() => setSelectedStrategy("SEND_RECOVERY_LINK")}
-                className={`p-3 rounded-sm border text-left space-y-1 transition-all ${
-                  selectedStrategy === "SEND_RECOVERY_LINK"
-                    ? "border-signal bg-signal/10 text-signal font-bold"
-                    : "border-line bg-paper text-ink"
-                }`}
-              >
-                <div className="font-bold text-[11px]">SMART LINK</div>
-                <div className="text-[10px] text-signal font-bold">P(Recov): 74%</div>
-                <p className="text-[9px] text-muted">Cost: ₹42</p>
-              </button>
-
-              <button
-                onClick={() => setSelectedStrategy("RETRY_NOW")}
-                className={`p-3 rounded-sm border text-left space-y-1 transition-all ${
-                  selectedStrategy === "RETRY_NOW"
-                    ? "border-danger bg-danger/10 text-danger font-bold"
-                    : "border-line bg-paper text-ink"
-                }`}
-              >
-                <div className="font-bold text-[11px]">RETRY NOW</div>
-                <div className="text-[10px] text-danger font-bold">P(Recov): 32%</div>
-                <p className="text-[9px] text-danger">Duplicate Risk</p>
-              </button>
-
-              <button
-                onClick={() => setSelectedStrategy("STOP")}
-                className={`p-3 rounded-sm border text-left space-y-1 transition-all ${
-                  selectedStrategy === "STOP"
-                    ? "border-muted bg-paper-dark text-ink font-bold"
-                    : "border-line bg-paper text-ink"
-                }`}
-              >
-                <div className="font-bold text-[11px]">STOP ACTION</div>
-                <div className="text-[10px] text-muted font-bold">P(Recov): 5%</div>
-                <p className="text-[9px] text-muted">Anti-Fatigue</p>
-              </button>
-            </div>
-
-            {/* Expected Net Value Calculation Output */}
-            <div className="p-4 rounded-sm bg-paper border border-line font-mono text-xs space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted">Expected Gross Value:</span>
-                <span className="text-ink font-bold">₹{expectedGross.toLocaleString("en-IN")}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Intervention Cost:</span>
-                <span className="text-danger font-bold">-₹{interventionCost}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-line text-sm font-bold">
-                <span className="text-ink">Expected Net Value:</span>
-                <span className="text-safe font-display">₹{expectedNet.toLocaleString("en-IN")}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Customer Fatigue Model & Counterfactual Proof (5 Cols) */}
-          <div className="lg:col-span-5 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
-            <div className="border-b border-line pb-4">
-              <div className="text-xs font-mono font-bold uppercase tracking-widest text-signal">
-                FATIGUE & COUNTERFACTUAL ROI
-              </div>
-              <h2 className="text-xl font-bold font-display text-ink">
-                Customer Fatigue Index & ROI Proof
-              </h2>
-            </div>
-
-            {/* Fatigue Score Gauges */}
-            <div className="space-y-3 font-mono text-xs">
-              <div className="flex justify-between">
-                <span className="text-ink">Customer Fatigue Score:</span>
-                <span
-                  className={`font-bold text-sm ${
-                    fatigueScore >= 80 ? "text-danger" : fatigueScore >= 50 ? "text-warning" : "text-safe"
-                  }`}
-                >
-                  {fatigueScore} / 100 ({fatigueScore >= 80 ? "CRITICAL" : fatigueScore >= 50 ? "ELEVATED" : "LOW"})
-                </span>
-              </div>
-              <div className="w-full bg-paper-dark h-2 rounded-none overflow-hidden">
-                <div
-                  className={`h-full ${
-                    fatigueScore >= 80 ? "bg-danger" : fatigueScore >= 50 ? "bg-warning" : "bg-safe"
-                  }`}
-                  style={{ width: `${fatigueScore}%` }}
-                />
-              </div>
-
-              {/* Sliders for fatigue test */}
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div>
-                  <span className="text-[10px] text-muted uppercase">Messages Sent: {messagesSent}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="4"
-                    value={messagesSent}
-                    onChange={(e) => setMessagesSent(Number(e.target.value))}
-                    className="w-full accent-signal"
-                  />
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted uppercase">Retries: {retryCount}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="4"
-                    value={retryCount}
-                    onChange={(e) => setRetryCount(Number(e.target.value))}
-                    className="w-full accent-signal"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Counterfactual Analysis Card */}
-            <div className="p-4 rounded-sm bg-paper border border-safe/40 space-y-3 font-mono text-xs">
-              <div className="text-[11px] font-bold text-safe uppercase">
-                What if SAFRA did nothing? (Counterfactual Benchmark)
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-2.5 rounded-sm bg-surface border border-line">
-                  <span className="text-[10px] text-muted uppercase block">No Action Baseline</span>
-                  <span className="text-danger font-bold text-base">₹0</span>
-                </div>
-                <div className="p-2.5 rounded-sm bg-surface border border-safe">
-                  <span className="text-[10px] text-safe uppercase block font-bold">SAFRA Action</span>
-                  <span className="text-safe font-bold text-base">+₹{sandboxAmount.toLocaleString("en-IN")}</span>
-                </div>
-              </div>
-              <p className="text-[10px] text-ink-soft">
-                Incremental Value Created: <strong>+100% of transaction GMV saved</strong> from customer churn.
+              <h1 className="text-3xl sm:text-4xl font-bold font-display text-ink tracking-tight">
+                Discrete Event Simulation & Recovery Orchestrator
+              </h1>
+              <p className="text-xs font-mono text-ink-soft">
+                Stress-test revenue recovery policies across thousands to millions of simulated payments.
               </p>
             </div>
+
+            {/* Virtual Clock Display */}
+            <div className="p-4 rounded-sm bg-paper border border-line flex items-center gap-6 font-mono">
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-muted uppercase block">Virtual Simulation Time</span>
+                <span className="text-3xl font-bold font-display text-ink tracking-widest">{simTime}</span>
+              </div>
+              <div className="space-y-0.5 border-l border-line pl-4">
+                <span className="text-[10px] text-muted uppercase block">Engine Speed</span>
+                <span className="text-lg font-bold text-signal">{virtualSpeed}x Speed</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Virtual Time Controls & Speed Selectors */}
+          <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+            {/* Play / Pause / Reset Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleControlAction(isPlaying ? "PAUSE" : "PLAY")}
+                className={`px-4 py-2 rounded-sm font-bold uppercase flex items-center gap-2 transition-all ${
+                  isPlaying
+                    ? "bg-signal text-paper hover:bg-signal-dark"
+                    : "bg-safe text-paper hover:bg-safe-dark"
+                }`}
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                <span>{isPlaying ? "PAUSE" : "PLAY"}</span>
+              </button>
+
+              <button
+                onClick={() => handleControlAction("STEP")}
+                className="px-3 py-2 bg-paper border border-line hover:border-ink text-ink font-semibold rounded-sm flex items-center gap-1.5"
+              >
+                <FastForward className="w-4 h-4 text-signal" />
+                <span>STEP TICK</span>
+              </button>
+
+              <button
+                onClick={() => handleControlAction("RESET")}
+                className="px-3 py-2 bg-paper border border-line hover:border-danger text-ink font-semibold rounded-sm flex items-center gap-1.5"
+              >
+                <RotateCcw className="w-4 h-4 text-muted" />
+                <span>RESET</span>
+              </button>
+            </div>
+
+            {/* Speed Multipliers */}
+            <div className="flex items-center gap-1 bg-paper p-1 rounded-sm border border-line">
+              <span className="text-[10px] text-muted px-2 uppercase">Speed:</span>
+              {[1, 5, 10, 50, 100, 1000].map((spd) => (
+                <button
+                  key={spd}
+                  onClick={() => handleSpeedChange(spd)}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-sm transition-all ${
+                    virtualSpeed === spd
+                      ? "bg-ink text-paper"
+                      : "text-ink-soft hover:text-ink hover:bg-surface"
+                  }`}
+                >
+                  {spd}x
+                </button>
+              ))}
+            </div>
+
+            {/* Seed & Reproducibility Bar */}
+            <div className="flex items-center gap-2 bg-paper px-3 py-1.5 rounded-sm border border-line">
+              <span className="text-[10px] text-muted uppercase">SEED:</span>
+              <input
+                type="text"
+                value={simulationSeed}
+                onChange={(e) => setSimulationSeed(e.target.value)}
+                className="w-36 bg-transparent text-xs font-bold text-ink focus:outline-none border-b border-line"
+              />
+              <button
+                onClick={handleCopySeed}
+                title="Copy Simulation Seed"
+                className="p-1 text-ink-soft hover:text-signal"
+              >
+                {seedCopied ? <Check className="w-4 h-4 text-safe" /> : <Copy className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={handleSeedReplay}
+                className="px-2.5 py-1 bg-surface border border-line hover:border-signal text-[11px] font-bold rounded-sm"
+              >
+                REPLAY
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Section: Failure Reasons Distribution & Live Event Log */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Failure Reasons Bar Chart (6 Cols) */}
-          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-5 shadow-sm">
-            <div className="border-b border-line pb-3 font-mono">
-              <h2 className="text-xs font-bold text-ink uppercase tracking-wider">
-                Failure Distribution by Category
-              </h2>
+        {/* Simulation Scale & Merchant Profile Selection */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 font-mono text-xs">
+          {/* Scale Selector (6 Cols) */}
+          <div className="lg:col-span-6 p-6 rounded-sm border border-line bg-surface space-y-4 shadow-sm">
+            <div className="flex justify-between items-center border-b border-line pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <Layers className="w-4 h-4 text-signal" />
+                <span>Simulation Scale Level</span>
+              </span>
+              <span className="text-[11px] text-signal font-bold">{scaleLevel}</span>
             </div>
-            <div className="h-[220px] w-full font-mono text-xs">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={failureBarData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D7D2C8" />
-                  <XAxis dataKey="reason" stroke="#121816" tick={{ fontSize: 9 }} />
-                  <YAxis stroke="#121816" tick={{ fontSize: 10 }} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#FFFCF5", borderColor: "#D7D2C8", fontSize: 11 }}
-                  />
-                  <Bar dataKey="count" fill="#E96B3D" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { key: "LEVEL_1_DEMO", label: "L1: DEMO", desc: "100 - 1k events" },
+                { key: "LEVEL_2_MERCHANT_DAY", label: "L2: MERCHANT DAY", desc: "10k - 50k events" },
+                { key: "LEVEL_3_HIGH_VOLUME", label: "L3: HIGH VOLUME", desc: "100k - 500k events" },
+                { key: "LEVEL_4_STRESS_TEST", label: "L4: STRESS TEST", desc: "1,000,000+ events" },
+                { key: "LEVEL_5_INCIDENT_MODE", label: "L5: INCIDENT MODE", desc: "Cascading Shocks" }
+              ].map((lvl) => (
+                <button
+                  key={lvl.key}
+                  onClick={() => handleScaleChange(lvl.key)}
+                  className={`p-2.5 rounded-sm border text-left space-y-0.5 transition-all ${
+                    scaleLevel === lvl.key
+                      ? "border-signal bg-signal/10 text-signal font-bold"
+                      : "border-line bg-paper text-ink hover:border-ink-soft"
+                  }`}
+                >
+                  <div className="text-[11px]">{lvl.label}</div>
+                  <div className="text-[9px] text-muted">{lvl.desc}</div>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Live Streaming Asynchronous Event Log (6 Cols) */}
-          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-4 shadow-sm font-mono text-xs">
-            <div className="flex items-center justify-between border-b border-line pb-3">
-              <h2 className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                <Radio className="w-4 h-4 text-signal animate-pulse" />
-                <span>Live Event Stream (Asynchronous)</span>
+          {/* Merchant Profile Selector (6 Cols) */}
+          <div className="lg:col-span-6 p-6 rounded-sm border border-line bg-surface space-y-4 shadow-sm">
+            <div className="flex justify-between items-center border-b border-line pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-signal" />
+                <span>Merchant Business Profile</span>
+              </span>
+              <span className="text-[11px] text-safe font-bold">{merchantProfile}</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { key: "DIGITAL_COMMERCE", label: "E-Commerce", desc: "UPI heavy, AOV ₹1.5k" },
+                { key: "SUBSCRIPTION_SAAS", label: "Subscription SaaS", desc: "Recurring tokens ₹5k" },
+                { key: "B2B_SAAS", label: "B2B Enterprise", desc: "Invoices Net-30 ₹85k" },
+                { key: "MARKETPLACE", label: "Marketplace", desc: "Multi-vendor ₹2.5k" },
+                { key: "EDUCATION_PLATFORM", label: "EdTech Platform", desc: "High ticket ₹28k" },
+                { key: "TRAVEL_PLATFORM", label: "Travel & Flights", desc: "Booking urgency ₹12k" }
+              ].map((m) => (
+                <button
+                  key={m.key}
+                  onClick={() => handleMerchantChange(m.key)}
+                  className={`p-2.5 rounded-sm border text-left space-y-0.5 transition-all ${
+                    merchantProfile === m.key
+                      ? "border-safe bg-safe/10 text-safe font-bold"
+                      : "border-line bg-paper text-ink hover:border-ink-soft"
+                  }`}
+                >
+                  <div className="text-[11px]">{m.label}</div>
+                  <div className="text-[9px] text-muted">{m.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Flagship Feature: THE ₹10 CRORE PAYMENT DAY */}
+        <div className="p-6 sm:p-8 rounded-sm border-2 border-signal bg-paper space-y-6 shadow-md font-mono">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-line">
+            <div className="space-y-1">
+              <span className="px-2.5 py-0.5 bg-signal text-paper text-[10px] font-bold tracking-widest uppercase">
+                FLAGSHIP 24-HOUR SIMULATION
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold font-display text-ink">
+                THE ₹10 CRORE PAYMENT DAY
               </h2>
-              <span className="text-[10px] text-muted">{kpis.recent_events?.length || 3} Events in Window</span>
+              <p className="text-xs text-ink-soft">
+                Full 24-hour simulation across 250,000+ payments demonstrating peak incident recovery and zero duplicate charges.
+              </p>
             </div>
 
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-              {kpis.recent_events?.map((ev: any, idx: number) => (
-                <div key={idx} className="p-2.5 rounded-sm bg-paper border border-line flex items-center justify-between gap-3">
-                  <div className="space-y-0.5 flex-1 truncate">
-                    <div className="flex items-center gap-2 font-bold text-ink">
-                      <span className="text-signal text-[10px]">[{ev.event_type}]</span>
-                      <span className="text-muted text-[10px]">{ev.timestamp}</span>
+            <button
+              onClick={handleStartFlagship}
+              className="px-5 py-2.5 bg-signal hover:bg-signal-dark text-paper font-display text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-sm flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4 text-paper" />
+              <span>{flagshipActive ? "Active Scenario" : "Run ₹10 Crore Scenario"}</span>
+            </button>
+          </div>
+
+          {flagshipData && (
+            <div className="space-y-6">
+              {/* Financial Metrics Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div className="p-3.5 bg-surface border border-line">
+                  <span className="text-[10px] text-muted uppercase block">Total Processed GMV</span>
+                  <span className="text-2xl font-bold font-display text-ink">₹10.00 Cr</span>
+                </div>
+                <div className="p-3.5 bg-surface border border-danger">
+                  <span className="text-[10px] text-danger uppercase block font-bold">Peak Revenue At Risk</span>
+                  <span className="text-2xl font-bold font-display text-danger">₹1.42 Cr</span>
+                </div>
+                <div className="p-3.5 bg-surface border border-safe">
+                  <span className="text-[10px] text-safe uppercase block font-bold">SAFRA Revenue Recovered</span>
+                  <span className="text-2xl font-bold font-display text-safe">₹1.18 Cr</span>
+                </div>
+                <div className="p-3.5 bg-surface border border-signal">
+                  <span className="text-[10px] text-signal uppercase block font-bold">Net Incremental Value</span>
+                  <span className="text-2xl font-bold font-display text-signal">+₹70.40L</span>
+                </div>
+              </div>
+
+              {/* 24-Hour Timeline Stepper */}
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-ink uppercase block">
+                  24-Hour Incident & Recovery Progression:
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  {flagshipData.timeline_stages?.map((st: any, idx: number) => (
+                    <div key={idx} className="p-3 bg-surface border border-line space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-signal">{st.sim_time}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-paper border border-line rounded-sm">
+                          {st.status}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-ink text-xs font-display">{st.title}</h4>
+                      <p className="text-[11px] text-ink-soft">{st.description}</p>
                     </div>
-                    <p className="text-[11px] text-ink-soft truncate">{ev.details}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 10 Incident Library Buttons + Black Swan Mode */}
+        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm font-mono text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-line">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-signal">
+                INCIDENT SIMULATION LIBRARY (10 SCENARIOS + BLACK SWAN)
+              </span>
+              <h3 className="text-xl font-bold font-display text-ink">
+                Simulate Cascading Failures, Switch Outages & Silent Leaks
+              </h3>
+            </div>
+
+            <button
+              onClick={() => setIncidentModalOpen(true)}
+              className="px-4 py-2 bg-paper border border-line hover:border-signal text-ink font-bold rounded-sm flex items-center gap-1.5"
+            >
+              <Crosshair className="w-4 h-4 text-signal" />
+              <span>+ Custom Incident Injector</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {incidentList.map((inc) => (
+              <button
+                key={inc.key}
+                onClick={() => handleScenarioSelect(inc.key)}
+                className={`p-3.5 rounded-sm border text-left space-y-1 transition-all ${
+                  activeScenario === inc.key
+                    ? inc.key === "BLACK_SWAN_MODE"
+                      ? "border-danger bg-danger/15 text-danger font-bold"
+                      : "border-signal bg-signal/10 text-signal font-bold"
+                    : "border-line bg-paper text-ink hover:border-ink-soft"
+                }`}
+              >
+                <div className="font-bold text-[11px]">{inc.label}</div>
+                <div className="text-[10px] text-muted">{inc.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Incident Causal Dependency Graph & Anomaly Root Cause */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 font-mono text-xs">
+          {/* Causal Chain Visualization (6 Cols) */}
+          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-5 shadow-sm">
+            <div className="border-b border-line pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <GitBranch className="w-4 h-4 text-signal" />
+                <span>Incident Causal Dependency Chain</span>
+              </span>
+              <p className="text-[11px] text-ink-soft mt-0.5">
+                Upstream provider bottleneck propagation to checkout & recovery queue.
+              </p>
+            </div>
+
+            <div className="p-4 bg-paper border border-line space-y-3">
+              <div className="flex items-center justify-between p-2.5 bg-surface border border-line">
+                <span className="font-bold">1. BANK SWITCH LATENCY</span>
+                <span className="text-danger font-bold">+240% Degradation</span>
+              </div>
+              <div className="flex justify-center text-signal font-bold text-sm">↓</div>
+              <div className="flex items-center justify-between p-2.5 bg-surface border border-line">
+                <span className="font-bold">2. CALLBACK TIME OUT ACCUMULATION</span>
+                <span className="text-danger font-bold">42% Ingestion Delay</span>
+              </div>
+              <div className="flex justify-center text-signal font-bold text-sm">↓</div>
+              <div className="flex items-center justify-between p-2.5 bg-surface border border-line">
+                <span className="font-bold">3. CUSTOMER RAPID RETRY PRESSURE</span>
+                <span className="text-warning font-bold">14.2% Duplicate Risk</span>
+              </div>
+              <div className="flex justify-center text-signal font-bold text-sm">↓</div>
+              <div className="flex items-center justify-between p-2.5 bg-surface border border-safe">
+                <span className="font-bold text-safe">4. SAFRA 300s WAIT BARRIER ENGAGED</span>
+                <span className="text-safe font-bold">0 Duplicates Permitted</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Anomaly Detection & Hypotheses (6 Cols) */}
+          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-5 shadow-sm">
+            <div className="border-b border-line pb-3 flex justify-between items-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <Zap className="w-4 h-4 text-signal" />
+                <span>Deterministic Anomaly Detector (EWMA / Z-Score)</span>
+              </span>
+              <span className="text-[11px] text-safe font-bold">
+                Z-Latency: {anomalyData.z_latency} (Threshold: 2.5)
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {anomalyData.ranked_hypotheses?.map((h: any, idx: number) => (
+                <div key={idx} className="p-4 rounded-sm bg-paper border border-line space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-ink">
+                      #{h.rank} {h.title}
+                    </span>
+                    <span className="text-safe font-bold">
+                      Confidence: {(h.confidence_score * 100).toFixed(0)}%
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-sm bg-surface border border-line text-[10px] font-semibold text-ink">
-                    {ev.stage}
-                  </span>
+                  <div className="space-y-1 text-[11px] text-ink-soft">
+                    {h.evidence?.map((ev: string, evIdx: number) => (
+                      <div key={evIdx} className="flex items-center gap-1.5">
+                        <span className="text-signal font-bold">•</span>
+                        <span>{ev}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-line text-[11px] text-safe font-bold flex justify-between">
+                    <span>Action: {h.recommended_action}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Section: Investigation Notebook List & Export */}
-        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line pb-4 font-mono">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-widest text-signal">
-                INVESTIGATION NOTEBOOK
-              </div>
-              <h2 className="text-xl font-bold font-display text-ink">
-                Saved Engineering Hypotheses & Investigation Dossiers
-              </h2>
+        {/* Prioritized Recovery Queue with Knapsack Budget Constraints */}
+        <div className="p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-6 shadow-sm font-mono text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-line">
+            <div className="space-y-0.5">
+              <span className="text-xs font-bold uppercase tracking-widest text-signal">
+                CONSTRAINED RECOVERY QUEUE PRIORITIZER
+              </span>
+              <h3 className="text-xl font-bold font-display text-ink">
+                Knapsack Optimization under Intervention & Budget Constraints
+              </h3>
             </div>
 
             <button
-              onClick={() => setNotebookModalOpen(true)}
-              className="px-4 py-2 bg-ink hover:bg-ink-soft text-paper text-xs font-display font-bold uppercase rounded-sm transition-colors"
+              onClick={handlePrioritizeQueue}
+              className="px-4 py-2 bg-ink text-paper font-bold uppercase rounded-sm hover:bg-ink-soft transition-colors"
             >
-              + New Observation Note
+              Re-Calculate Priority Queue
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
-            {notesList.map((note, idx) => (
-              <div key={idx} className="p-5 rounded-sm bg-paper border border-line space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-signal">{note.id}</span>
-                  <span className="text-[10px] text-muted">{note.created_at}</span>
-                </div>
-                <h3 className="font-bold text-ink text-sm font-display">{note.title}</h3>
-                <p className="text-xs text-ink-soft leading-relaxed font-body">{note.hypothesis}</p>
-                <div className="flex items-center justify-between pt-2 border-t border-line text-[10px] text-muted">
-                  <span>Author: {note.author}</span>
-                  <button
-                    onClick={() => alert(`Exporting JSON Dossier for ${note.id}...`)}
-                    className="text-signal hover:underline font-bold"
-                  >
-                    Export Dossier JSON →
-                  </button>
-                </div>
+          {/* Constraint Sliders */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-paper border border-line">
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <span>Max Interventions / Min:</span>
+                <strong className="text-signal">{maxInterventions} actions</strong>
               </div>
-            ))}
+              <input
+                type="range"
+                min="50"
+                max="2000"
+                step="50"
+                value={maxInterventions}
+                onChange={(e) => setMaxInterventions(Number(e.target.value))}
+                className="w-full accent-signal"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <span>Max Recovery Budget (INR):</span>
+                <strong className="text-safe">₹{recoveryBudget.toLocaleString("en-IN")}</strong>
+              </div>
+              <input
+                type="range"
+                min="5000"
+                max="200000"
+                step="5000"
+                value={recoveryBudget}
+                onChange={(e) => setRecoveryBudget(Number(e.target.value))}
+                className="w-full accent-safe"
+              />
+            </div>
+          </div>
+
+          {/* Allocation Statistics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div className="p-3 bg-paper border border-safe">
+              <span className="text-[10px] text-safe uppercase font-bold block">Allocated Actions</span>
+              <span className="text-lg font-bold text-safe">{prioritizedQueue.allocated_count}</span>
+            </div>
+            <div className="p-3 bg-paper border border-line">
+              <span className="text-[10px] text-muted uppercase block">Deferred in Cooldown</span>
+              <span className="text-lg font-bold text-ink">{prioritizedQueue.wait_count}</span>
+            </div>
+            <div className="p-3 bg-paper border border-danger">
+              <span className="text-[10px] text-danger uppercase font-bold block">Stopped (Fatigue)</span>
+              <span className="text-lg font-bold text-danger">{prioritizedQueue.stopped_fatigue_count}</span>
+            </div>
+            <div className="p-3 bg-paper border border-signal">
+              <span className="text-[10px] text-signal uppercase font-bold block">Expected Recovery</span>
+              <span className="text-lg font-bold text-signal">
+                ₹{prioritizedQueue.total_expected_recovery_inr?.toLocaleString("en-IN")}
+              </span>
+            </div>
+          </div>
+
+          {/* Prioritized Action Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              <thead>
+                <tr className="border-b border-line text-[10px] text-muted uppercase">
+                  <th className="py-2">Rank</th>
+                  <th className="py-2">Transaction ID</th>
+                  <th className="py-2">Amount (INR)</th>
+                  <th className="py-2">P(Recovery)</th>
+                  <th className="py-2">Priority Score</th>
+                  <th className="py-2">Decision</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line text-[11px]">
+                {prioritizedQueue.top_allocated_actions?.map((act: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-paper">
+                    <td className="py-2.5 font-bold text-signal">#{act.rank}</td>
+                    <td className="py-2.5 text-ink">{act.transaction_id}</td>
+                    <td className="py-2.5 font-bold">₹{act.amount?.toLocaleString("en-IN")}</td>
+                    <td className="py-2.5 font-bold text-safe">{(act.recovery_probability * 100).toFixed(0)}%</td>
+                    <td className="py-2.5 font-mono text-ink">{act.priority_score}</td>
+                    <td className="py-2.5 text-safe font-bold">{act.decision}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* CSV Export Modal */}
-        {exportModalOpen && (
-          <div className="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-mono text-xs">
-            <div className="bg-surface border border-line rounded-sm max-w-md w-full p-6 space-y-5 shadow-2xl">
-              <div className="flex items-center justify-between pb-3 border-b border-line">
-                <h3 className="font-bold text-ink text-sm uppercase">Export Live Dataset as CSV</h3>
-                <button onClick={() => setExportModalOpen(false)} className="text-muted hover:text-ink">
-                  ✕
-                </button>
-              </div>
-              <p className="text-xs text-ink-soft font-body">
-                Downloads verified records currently active in the payment simulation engine with exact calculated fields.
-              </p>
+        {/* Multi-Strategy Comparison & Monte Carlo Experiment Runner */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 font-mono text-xs">
+          {/* 4-Strategy Comparison (6 Cols) */}
+          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-5 shadow-sm">
+            <div className="flex justify-between items-center border-b border-line pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-signal" />
+                <span>Multi-Strategy Recovery Comparison</span>
+              </span>
+              <button
+                onClick={handleRunMultiStrategy}
+                className="px-3 py-1.5 bg-paper border border-line text-signal font-bold rounded-sm hover:border-signal"
+              >
+                Evaluate Strategies
+              </button>
+            </div>
+
+            {strategyReport ? (
               <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] text-muted uppercase block">Status Filter</span>
-                  <select className="w-full p-2 bg-paper border border-line text-ink rounded-sm">
-                    <option value="">ALL STATUSES</option>
-                    <option value="SUCCESS">SUCCESS ONLY</option>
-                    <option value="PENDING">PENDING ONLY</option>
-                    <option value="FAILED">FAILED ONLY</option>
-                  </select>
-                </div>
+                {Object.values(strategyReport.strategies || {}).map((st: any, idx: number) => (
+                  <div key={idx} className="p-3.5 bg-paper border border-line space-y-1.5">
+                    <div className="flex justify-between items-center font-bold">
+                      <span className="text-ink">{st.name}</span>
+                      <span className={idx === 3 ? "text-safe" : "text-ink"}>
+                        ₹{st.net_value_created_inr?.toLocaleString("en-IN")} Net
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-muted">
+                      <span>Interventions: {st.interventions_count}</span>
+                      <span>Fatigue Index: {st.customer_fatigue_index}</span>
+                      <span>Recovery Eff: {st.recovery_efficiency_pct}%</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="pt-2 flex justify-end gap-3">
-                <button
-                  onClick={() => {
-                    window.location.href = "http://localhost:8000/api/dataset/export/transactions.csv";
-                    setExportModalOpen(false);
-                  }}
-                  className="w-full py-2.5 bg-signal hover:bg-signal-dark text-paper font-display text-xs font-bold uppercase rounded-sm transition-colors"
-                >
-                  Download CSV File
-                </button>
-              </div>
-            </div>
+            ) : (
+              <p className="text-xs text-ink-soft py-4 text-center">
+                Click Evaluate Strategies to compare Blind Retry, High-Value, Probability Threshold, and SAFRA Adaptive Policy.
+              </p>
+            )}
           </div>
-        )}
 
-        {/* CSV Import Modal & Validation Report */}
-        {importModalOpen && (
-          <div className="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-mono text-xs">
-            <div className="bg-surface border border-line rounded-sm max-w-lg w-full p-6 space-y-5 shadow-2xl">
-              <div className="flex items-center justify-between pb-3 border-b border-line">
-                <h3 className="font-bold text-ink text-sm uppercase">Import Payment Dataset CSV</h3>
-                <button onClick={() => setImportModalOpen(false)} className="text-muted hover:text-ink">
-                  ✕
-                </button>
-              </div>
-
-              {!importReport ? (
-                <div className="space-y-4">
-                  <p className="text-xs text-ink-soft font-body">
-                    Upload external payment events to execute validation checks and run SAFRA recovery intelligence.
-                  </p>
-                  <label className="border-2 border-dashed border-line hover:border-signal p-8 rounded-sm text-center block cursor-pointer bg-paper">
-                    <Upload className="w-6 h-6 text-signal mx-auto mb-2" />
-                    <span className="text-xs font-bold text-ink block">Click to select .CSV file</span>
-                    <span className="text-[10px] text-muted">Supports transaction_id, amount, payment_method, bank, status</span>
-                    <input type="file" accept=".csv" onChange={handleFileUpload} className="hidden" />
-                  </label>
-                  {isImporting && <p className="text-xs text-signal font-bold text-center">Validating records...</p>}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="p-3 bg-safe/10 border border-safe text-safe text-xs font-bold">
-                    Validation Completed: {importReport.filename}
-                  </div>
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="p-3 bg-paper border border-line">
-                      <span className="text-[10px] text-muted block uppercase">Received</span>
-                      <span className="text-ink font-bold text-base">{importReport.records_received}</span>
-                    </div>
-                    <div className="p-3 bg-paper border border-safe">
-                      <span className="text-[10px] text-safe block uppercase font-bold">Valid</span>
-                      <span className="text-safe font-bold text-base">{importReport.valid_records_count}</span>
-                    </div>
-                    <div className="p-3 bg-paper border border-danger">
-                      <span className="text-[10px] text-danger block uppercase font-bold">Rejected</span>
-                      <span className="text-danger font-bold text-base">{importReport.rejected_records_count}</span>
-                    </div>
-                  </div>
-
-                  {importReport.rejection_reasons?.length > 0 && (
-                    <div className="p-3 bg-paper border border-line space-y-1 max-h-32 overflow-y-auto">
-                      <span className="text-[10px] text-muted uppercase font-bold block">Rejection Breakdown:</span>
-                      {importReport.rejection_reasons.map((r: string, idx: number) => (
-                        <div key={idx} className="text-[10px] text-danger">• {r}</div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="flex justify-end gap-3 pt-2">
-                    <button
-                      onClick={() => {
-                        window.location.href = "http://localhost:8000/api/dataset/import/rejected_rows.csv";
-                      }}
-                      className="px-4 py-2 bg-paper border border-line text-ink text-xs font-bold rounded-sm"
-                    >
-                      Download Rejected Rows CSV
-                    </button>
-                    <button
-                      onClick={() => {
-                        setImportReport(null);
-                        setImportModalOpen(false);
-                      }}
-                      className="px-4 py-2 bg-ink text-paper text-xs font-bold uppercase rounded-sm"
-                    >
-                      Close & View
-                    </button>
-                  </div>
-                </div>
-              )}
+          {/* Monte Carlo Experiment Runner (6 Cols) */}
+          <div className="lg:col-span-6 p-6 sm:p-8 rounded-sm border border-line bg-surface space-y-5 shadow-sm">
+            <div className="flex justify-between items-center border-b border-line pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-signal" />
+                <span>Monte Carlo Research Runner (N=50 Runs)</span>
+              </span>
+              <button
+                onClick={handleRunMonteCarlo}
+                disabled={isMonteCarloRunning}
+                className="px-3 py-1.5 bg-signal text-paper font-bold uppercase rounded-sm hover:bg-signal-dark"
+              >
+                {isMonteCarloRunning ? "Simulating..." : "Run 50 Simulations"}
+              </button>
             </div>
-          </div>
-        )}
 
-        {/* Notebook Note Creation Modal */}
-        {notebookModalOpen && (
+            {monteCarloReport ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="p-3 bg-paper border border-line">
+                    <span className="text-[10px] text-muted uppercase block">Baseline Policy</span>
+                    <span className="text-sm font-bold text-ink">
+                      ₹{(monteCarloReport.baseline_stats?.mean_inr / 100000).toFixed(2)}L ± ₹
+                      {(monteCarloReport.baseline_stats?.std_dev_inr / 100000).toFixed(2)}L
+                    </span>
+                  </div>
+                  <div className="p-3 bg-paper border border-safe">
+                    <span className="text-[10px] text-safe uppercase font-bold block">SAFRA Adaptive Policy</span>
+                    <span className="text-sm font-bold text-safe">
+                      ₹{(monteCarloReport.safra_stats?.mean_inr / 100000).toFixed(2)}L ± ₹
+                      {(monteCarloReport.safra_stats?.std_dev_inr / 100000).toFixed(2)}L
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-safe/10 border border-safe text-safe text-xs font-bold text-center">
+                  Mean Incremental Gain: +₹
+                  {(monteCarloReport.mean_incremental_gain_inr / 100000).toFixed(2)}L (
+                  {monteCarloReport.statistical_significance})
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-ink-soft py-4 text-center">
+                Execute 50 Monte Carlo trials across randomized seeds to compute 95% Confidence Intervals.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Custom Incident Injector Modal */}
+        {incidentModalOpen && (
           <div className="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-mono text-xs">
             <div className="bg-surface border border-line rounded-sm max-w-md w-full p-6 space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between pb-3 border-b border-line">
-                <h3 className="font-bold text-ink text-sm uppercase">Add Investigation Observation</h3>
-                <button onClick={() => setNotebookModalOpen(false)} className="text-muted hover:text-ink">
+              <div className="flex justify-between items-center pb-3 border-b border-line">
+                <h3 className="font-bold text-ink text-sm uppercase">Inject Custom Incident</h3>
+                <button onClick={() => setIncidentModalOpen(false)} className="text-muted hover:text-ink">
                   ✕
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <span className="text-[10px] text-muted uppercase block">Observation Title</span>
+                  <span className="text-[10px] text-muted uppercase block">Incident Type</span>
+                  <select
+                    value={incidentType}
+                    onChange={(e) => setIncidentType(e.target.value)}
+                    className="w-full p-2 bg-paper border border-line text-ink rounded-sm"
+                  >
+                    <option value="BANK_LATENCY_DEGRADATION">Bank Core Latency Degradation</option>
+                    <option value="UPI_TIMEOUT_WAVE">UPI Gateway 504 Timeout Wave</option>
+                    <option value="CARD_ISSUER_FAILURE">Card Issuer Auth Server Failure</option>
+                    <option value="CHECKOUT_ABANDONMENT_SPIKE">SMS OTP Dropoff Spike</option>
+                  </select>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-muted uppercase block">
+                    Severity: {(incidentSeverity * 100).toFixed(0)}%
+                  </span>
                   <input
-                    type="text"
-                    placeholder="e.g. HDFC CBS timeout vs Payday surge"
-                    value={noteTitle}
-                    onChange={(e) => setNoteTitle(e.target.value)}
-                    className="w-full p-2 bg-paper border border-line text-ink rounded-sm focus:outline-none"
+                    type="range"
+                    min="0.1"
+                    max="1.0"
+                    step="0.05"
+                    value={incidentSeverity}
+                    onChange={(e) => setIncidentSeverity(Number(e.target.value))}
+                    className="w-full accent-signal"
                   />
                 </div>
 
                 <div>
-                  <span className="text-[10px] text-muted uppercase block">Hypothesis & Analysis</span>
-                  <textarea
-                    rows={4}
-                    placeholder="Describe observed failure correlations and recommended policy rules..."
-                    value={noteHypothesis}
-                    onChange={(e) => setNoteHypothesis(e.target.value)}
-                    className="w-full p-2 bg-paper border border-line text-ink rounded-sm focus:outline-none"
-                  />
+                  <span className="text-[10px] text-muted uppercase block">Target Provider</span>
+                  <select
+                    value={incidentTargetProvider}
+                    onChange={(e) => setIncidentTargetProvider(e.target.value)}
+                    className="w-full p-2 bg-paper border border-line text-ink rounded-sm"
+                  >
+                    <option value="HDFC">HDFC Bank</option>
+                    <option value="ICICI">ICICI Bank</option>
+                    <option value="SBI">State Bank of India</option>
+                    <option value="Axis">Axis Bank</option>
+                  </select>
                 </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
-                  onClick={handleSaveNote}
+                  onClick={handleInjectIncident}
                   className="w-full py-2.5 bg-signal hover:bg-signal-dark text-paper font-display text-xs font-bold uppercase rounded-sm transition-colors"
                 >
-                  Save to Investigation Notebook
+                  Inject Incident Shock
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Simulation Assumptions Modal */}
+        {assumptionsModalOpen && (
+          <div className="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-mono text-xs">
+            <div className="bg-surface border border-line rounded-sm max-w-xl w-full p-6 space-y-4 shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center pb-3 border-b border-line">
+                <h3 className="font-bold text-ink text-sm uppercase">Statistical Simulation Assumptions</h3>
+                <button onClick={() => setAssumptionsModalOpen(false)} className="text-muted hover:text-ink">
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-3 text-ink-soft leading-relaxed">
+                <div>
+                  <strong className="text-ink block">1. Log-Normal Transaction Amounts:</strong>
+                  <span>Amounts follow ln(X) ~ Normal(mu, sigma^2) parameterized per merchant profile to replicate heavy right-tail order values.</span>
+                </div>
+
+                <div>
+                  <strong className="text-ink block">2. Non-Homogeneous Poisson Arrival Process:</strong>
+                  <span>Payment arrival timing models diurnal diurnal(t) double-peak traffic with Poisson inter-arrival intervals.</span>
+                </div>
+
+                <div>
+                  <strong className="text-ink block">3. Pareto Provider Latency Distribution:</strong>
+                  <span>Bank CBS switch delays follow a Pareto long-tail distribution P(X &gt; x) = (x_m / x)^alpha capturing sudden 2,000ms+ spikes.</span>
+                </div>
+
+                <div>
+                  <strong className="text-ink block">4. Constrained Knapsack Prioritization:</strong>
+                  <span>SAFRA selects recovery interventions by maximizing expected gross recovery minus unit costs subject to bounded capacity limits.</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => setAssumptionsModalOpen(false)}
+                  className="px-4 py-2 bg-ink text-paper font-bold uppercase rounded-sm"
+                >
+                  Close Assumptions
                 </button>
               </div>
             </div>

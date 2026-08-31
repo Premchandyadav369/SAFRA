@@ -8,6 +8,7 @@ from app.database import models
 from app.data.generate_dataset import seed_dataset_if_empty
 from app.api.websockets import ws_manager
 from app.services.simulation_engine import simulation_engine
+from app.simulation import large_scale_engine
 
 # Import API Routers
 from app.api.routes.recovery_flow import router as recovery_flow_router
@@ -23,6 +24,7 @@ from app.api.routes.crypto_proofs import router as crypto_proofs_router
 from app.api.routes.dataset_lab import router as dataset_lab_router
 from app.api.routes.notebook import router as notebook_router
 from app.api.routes.live_lab import router as live_lab_router
+from app.api.routes.simulation_control import router as simulation_control_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,11 +41,14 @@ async def lifespan(app: FastAPI):
 
     # 3. Start Continuous Payment Simulation Engine in background
     sim_task = asyncio.create_task(simulation_engine.run_loop())
+    large_scale_task = asyncio.create_task(large_scale_engine.run_simulation_loop())
 
     yield
     print("[SAFRA] Shutting down SAFRA services...")
     simulation_engine.is_running = False
+    large_scale_engine.is_playing = False
     sim_task.cancel()
+    large_scale_task.cancel()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -75,6 +80,7 @@ app.include_router(crypto_proofs_router, prefix=settings.API_PREFIX)
 app.include_router(dataset_lab_router, prefix=settings.API_PREFIX)
 app.include_router(notebook_router, prefix=settings.API_PREFIX)
 app.include_router(live_lab_router, prefix=settings.API_PREFIX)
+app.include_router(simulation_control_router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():
@@ -84,7 +90,7 @@ async def root():
         "competition": "Razorpay AI Buildathon",
         "tagline": settings.PROJECT_TAGLINE,
         "version": settings.VERSION,
-        "environment": "SIMULATED PAYMENT INTELLIGENCE LAB",
+        "environment": "SIMULATED PAYMENT INTELLIGENCE ENVIRONMENT",
         "status": "OPERATIONAL",
         "docs_url": "/docs"
     }
@@ -99,11 +105,12 @@ async def health_check():
         "ai_model": settings.HF_MODEL_ID,
         "cryptography": "HMAC-SHA256-Merkle-Active",
         "websocket": "LIVE",
-        "environment": "SIMULATED PAYMENT ENVIRONMENT"
+        "environment": "SIMULATED PAYMENT INTELLIGENCE ENVIRONMENT"
     }
 
 @app.websocket("/ws")
 @app.websocket("/ws/live-stream")
+@app.websocket("/ws/simulation-stream")
 async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:

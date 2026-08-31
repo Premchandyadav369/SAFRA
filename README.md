@@ -1,5 +1,5 @@
 # SAFRA: Signal-Aware Financial Revenue Agent
-### **Autonomous Revenue Recovery Intelligence (Razorpay AI Buildathon: Track 03)**
+### **Autonomous Revenue Recovery Intelligence & Large-Scale Payment Ecosystem (Razorpay AI Buildathon: Track 03)**
 
 > **"When money moves but certainty does not: SAFRA follows the trail, diagnoses root causes, and executes bounded recovery workflows."**
 
@@ -24,179 +24,124 @@ Revenue loss rarely happens in a single catastrophic failure. Instead, it leaks 
 
 Traditional payment systems treat `PENDING` or `FAILED` as static dead ends or blast generic 1-message-fits-all reminders, creating customer fatigue.
 
-**SAFRA (Signal-Aware Financial Revenue Agent)** operates as an **investigative state machine and bounded workflow engine**. It continuously ingests payment stream telemetry, reconstructs transaction graph trails, computes deterministic recovery probabilities, and executes mathematically bounded actions with anti-spam stopping rules and cryptographic idempotency barriers.
+**SAFRA (Signal-Aware Financial Revenue Agent)** operates as an **investigative state machine, large-scale payment simulation ecosystem, and bounded workflow engine**. It continuously ingests payment stream telemetry, reconstructs transaction graph trails, computes deterministic recovery probabilities, and executes mathematically bounded actions with anti-spam stopping rules and cryptographic idempotency barriers.
 
 ---
 
-## 🧪 2. Simulated Payment Intelligence Lab (`/lab`)
+## 🧪 2. Large-Scale Payment Simulation Engine (`/lab`)
 
-SAFRA behaves as a **miniature payment operations and recovery laboratory**, simulating live digital payment lifecycles and continuously streaming events:
+> **Label:** `SIMULATED PAYMENT INTELLIGENCE ENVIRONMENT`  
+> *Notice: Never imply that simulated provider statistics represent real Razorpay, NPCI, bank, Google Pay, PhonePe, Paytm, or other production data.*
 
+SAFRA combines:
 ```
-CUSTOMER ──► CHECKOUT ──► PAYMENT INITIATED ──► PAYMENT RAIL ──► BANK / PSP RESPONSE
-                                                                          │
-┌───────────────────────────────┬─────────────────────────────────────────┘
+Payment Gateway Simulator + Payment Operations Control Room + Revenue Recovery Engine + Incident Response Lab + AI Decision Intelligence
+```
+
+### Complete Event-Driven Payment Lifecycle:
+```
+PAYMENT_CREATED ──► CHECKOUT_STARTED ──► PAYMENT_METHOD_SELECTED ──► PAYMENT_ATTEMPTED
+                                                                             │
+┌───────────────────────────────┬────────────────────────────────────────────┘
 │                               │
-▼ (SUCCESS / RECOVERED)         ▼ (PENDING / FAILED)
-COMPLETED SETTLEMENT            SAFRA RISK ANALYSIS & BOUNDED ACTION
-                                        │
-                                ┌───────┴───────┬───────────────┐
-                                ▼               ▼               ▼
-                        WAIT (5m)       SMART RECOVERY LINK    STOP (FATIGUE)
-```
-
-### Key Capabilities in the Simulation Lab:
-1. **8 Realistic Payment Rails:** `UPI`, `CREDIT_CARD`, `DEBIT_CARD`, `NETBANKING`, `WALLET`, `BANK_TRANSFER`, `SUBSCRIPTION`, `INVOICE`.
-2. **6 Provider Simulation Profiles:** `HDFC` (650ms), `ICICI` (490ms), `SBI` (810ms), `Axis` (540ms), `Kotak` (510ms), `Yes Bank` (590ms).
-3. **Dynamic Traffic Patterns:** `NORMAL`, `PAYDAY_SURGE` (3.5x), `FLASH_SALE` (5.0x), `BANK_OUTAGE` (HDFC 1,850ms CBS Timeout), `UPI_DEGRADATION`, `HIGH_ABANDONMENT`.
-4. **CSV Export & Import Suite with Validation Reports:** Download verified records (`/api/dataset/export/transactions.csv`) and upload historical datasets with rejected-row reporting.
-5. **Investigation Notebook:** Save observations, attach graph snapshots, and export compliance dossiers (`NOTE #...`).
-6. **Scripted 3-Minute Buildathon Demo:** One-click automated pitch demonstration from baseline to surge, outage, barrier engagement, and recovery clearing.
-
----
-
-## 📐 3. JAX-Style Differentiable Mathematical Formulation
-
-SAFRA models the revenue recovery problem as a constrained Markov Decision Process (MDP) with a differentiable parameterized scoring function:
-
-### A. Differentiable Recovery Scoring Formulation:
-$$\hat{P}_\theta(y = 1 \mid \mathbf{x}) = \sigma\left(\mathbf{w}^T \phi(\mathbf{x}) + b\right)$$
-
-Where:
-- $\sigma(z) = \frac{1}{1 + e^{-z}}$ (Sigmoid Activation Function)
-- $\phi(\mathbf{x}) \in \mathbb{R}^k$ (Extracted Signal Vector from Banking Telemetry, Client Intent, and History)
-- $\mathbf{w} = [\omega_{\text{bank\_ack}}, \omega_{\text{loyalty}}, \omega_{\text{intent}}, -\rho_{\text{nsf}}, -\rho_{\text{retries}}, -\rho_{\text{overdue}}]^T$
-
-### B. Constrained Bellman Optimality for Policy Selection:
-$$Q^*(s, a) = \mathcal{R}(s, a) + \gamma \sum_{s'} \mathcal{P}(s' \mid s, a) \max_{a'} Q^*(s', a')$$
-
-Subject to the strict idempotency barrier and contact constraints:
-$$\max_{a} Q^*(s, a) \quad \text{subject to:} \quad \begin{cases} 
-\mathbb{I}(\text{BarrierActive}) = 1 \implies a^* = \text{WAIT} \\
-N_{\text{retries}} \ge 3 \lor \hat{P}_\theta < 0.20 \implies a^* = \text{STOP}
-\end{cases}$$
-
----
-
-## 🔐 4. Cryptographic Primitives & Verifiable Merkle DAG
-
-SAFRA provides mathematical proof of zero duplicate charges and tamper-evident auditability:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                 SLIDING-WINDOW HMAC-SHA256 IDEMPOTENCY BARRIER              │
-│   H_idemp = HMAC-SHA256( K_seed, merchant || cust || amt || floor(t / 30s) )│
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                 TAMPER-EVIDENT CRYPTOGRAPHIC MERKLE HASH CHAIN              │
-│                                                                             │
-│   ┌───────────────┐        ┌───────────────┐        ┌───────────────┐       │
-│   │ Block B_0     │        │ Block B_1     │        │ Block B_2     │       │
-│   │ Prev: 0x00... │ ─────► │ Prev: Hash(B0)│ ─────► │ Prev: Hash(B1)│       │
-│   │ Event: INIT   │        │ Event: TIMEOUT│        │ Event: WAIT   │       │
-│   └───────────────┘        └───────────────┘        └───────────────┘       │
-│                                                                             │
-│   B_k = SHA256( B_{k-1} || txn_id || event_type || payload || timestamp )   │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-1. **Sliding-Window HMAC Collision Barrier:** Evaluates epochs $t$ and $t-1$ to prevent race conditions across distributed webhook worker nodes with zero database locks.
-2. **Tamper-Evident Hash Chain:** Mathematical proof that financial audit logs were not modified post-hoc.
-3. **Signed Action Tokens:** Ephemeral HMAC-signed nonces with 300s TTL for recovery link execution.
-4. **Binary Merkle Root:** Cryptographically seals batch settlements for T+1 financial accounting.
-
----
-
-## 🏗️ 5. High-Level System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                     SIMULATED PAYMENT EVENT ENGINE                          │
-│          (8 Rails: UPI, Cards, NetBanking, Subscriptions, Invoices)         │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       SAFRA INTELLIGENCE BACKEND (FASTAPI)                  │
-│                                                                             │
-│  ┌───────────────────────┐  ┌───────────────────────┐  ┌──────────────────┐ │
-│  │ Signal Engine         │  │ Recovery Engine       │  │ Crypto Engine    │ │
-│  │ - 10 Reality Signals  │  │ - Deterministic Score │  │ - HMAC-SHA256    │ │
-│  │ - Bank & Intent Telemetry│ - Explainable Breakdown│ - Merkle Hash DAG│ │
-│  └───────────┬───────────┘  └───────────┬───────────┘  └────────┬─────────┘ │
-│              │                          │                       │           │
-│              └──────────────────────────┼───────────────────────┘           │
-│                                         ▼                                   │
-│  ┌────────────────────────────────────────────────────────────────────────┐ │
-│  │ Graph Engine (NetworkX):                                               │ │
-│  │ Customer -> Checkout -> Payment Attempt -> Bank Switch -> Reconcile    │ │
-│  │ Active Risk Path Isolation • Missing Edge & Topology Drift Detection   │ │
-│  └──────────────────────────────────────┬─────────────────────────────────┘ │
-│                                         │                                   │
-│  ┌──────────────────────────────────────┴─────────────────────────────────┐ │
-│  │ Google Gemma 3 AI Layer (Hugging Face Inference + Fallback):            │ │
-│  │ - Factual Evidence Grounding (Zero Hallucination / Zero Money Movement)│ │
-│  │ - Interactive "Ask SAFRA" Root Cause Q&A Panel                         │ │
-│  └──────────────────────────────────────┬─────────────────────────────────┘ │
-│                                         │                                   │
-│  ┌──────────────────────────────────────┴─────────────────────────────────┐ │
-│  │ Database & Storage: SQLite/PostgreSQL (SQLAlchemy 2.0 Async Session)   │ │
-│  └────────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ REST APIs & WebSockets
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       SAFRA FRONTEND (NEXT.JS 14 / VERCEL)                  │
-│                                                                             │
-│  • Simulated Payment Intelligence Lab (/lab) with Dynamic Recharts         │
-│  • Editorial Investigation Canvas (DM Sans + Manrope + JetBrains Mono)     │
-│  • Interactive Chaos Sandbox with Sliders & Web Audio Feedback              │
-│  • 10-Node Relational Topology Network Graph with Path Tracing              │
-│  • Microsecond Audit Trail Log & Live Cryptographic Verifier Sandbox       │
-└─────────────────────────────────────────────────────────────────────────────┘
+▼                               ▼
+AUTHORIZATION ──► PROCESSING ──► OUTCOME:
+                                 ├── SUCCESS ──► COMPLETED SETTLEMENT
+                                 ├── PENDING ──► SAFRA ANALYSIS ──► WAIT (5m) / IDEMPOTENCY BARRIER
+                                 └── FAILED  ──► SAFRA ANALYSIS ──► BOUNDED RECOVERY POLICY
 ```
 
 ---
 
-## 📊 6. Batch Verification & Benchmark Proof
+## ⚙️ 3. Core Large-Scale Simulation Capabilities
 
-Tested on a benchmark batch of 500 heterogeneous transactions (₹45.7L total revenue at risk):
+### A. 5 Simulation Scale Levels:
+1. **LEVEL 1 — DEMO:** 100 to 1,000 payments (2 to 5 minutes) for pitch demonstrations.
+2. **LEVEL 2 — MERCHANT DAY:** 10,000 to 50,000 payments modeling a busy merchant day.
+3. **LEVEL 3 — HIGH VOLUME:** 100,000 to 500,000 payments for throughput benchmarking.
+4. **LEVEL 4 — STRESS TEST:** 1,000,000+ simulated payment events using event batching (`EVENT_BATCH`).
+5. **LEVEL 5 — INCIDENT MODE:** 50,000 payments/min under cascading shocks.
 
-| Performance Dimension | Generic 1-Message Recovery | SAFRA AI Strategy | Measured Impact |
-| :--- | :--- | :--- | :--- |
-| **Customer Interventions** | 500 (100% spam) | **142 bounded actions** | **-71.6% spam reduction** |
-| **Duplicate Debit Risk** | 14.2% duplicate rate | **0.0% (HMAC Barrier Engaged)** | **100% Protected** |
-| **Buyers Guarded from Spam** | 0 buyers | **358 buyers shielded** | **Anti-fatigue enforced** |
-| **Total Revenue Recovered** | ₹16.48L (34.2%) | **₹39.71L (82.4%)** | **+2.4x Net Recovery Yield** |
-| **Compliance Auditability** | Blackbox logs | **Cryptographic Merkle Chain**| **100% Verifiable** |
+### B. Virtual Time Engine ($1\times$ to $1000\times$):
+- Decouples simulation time ($t_{\text{sim}}$) from wall-clock time (`▶ PLAY`, `Ⅱ PAUSE`, `■ RESET`, `↻ STEP`).
+- 24 hours of simulated traffic can run in 2 to 10 minutes.
+- Virtual clock drives timestamps, retry schedules, provider incidents, customer responses, and due dates.
 
----
+### C. Deterministic PRNG Seeds & Bit-for-Bit Reproducibility:
+- Every simulation runs on a reproducible random seed (e.g. `SEED: SAFRA-2026-DEMO`).
+- Identical `(seed, scenario, config)` produces bit-for-bit identical event streams and recovery outcomes (`COPY SEED`, `REPLAY WITH SAME SEED`).
 
-## 🌐 7. Deployment & Production Setup
+### D. 6 Merchant Business Profiles:
+1. `DIGITAL_COMMERCE`: High volume, UPI heavy (65%), AOV ₹1,499, checkout abandonment.
+2. `SUBSCRIPTION_SAAS`: Recurring mandate billing (70%), AOV ₹4,999, token degradation.
+3. `B2B_SAAS`: Large invoices (65%), AOV ₹85,000, Net-30 overdue terms, promise-to-pay tracking.
+4. `MARKETPLACE`: High traffic, multiple sub-sellers, variable cart sizes (AOV ₹2,450).
+5. `EDUCATION_PLATFORM`: Periodic admission spikes, high-ticket installments (AOV ₹28,000).
+6. `TRAVEL_PLATFORM`: Booking urgency, seat expiry, multi-rail failovers (AOV ₹12,500).
 
-### Deploy Frontend to Vercel:
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPremchandyadav369%2FSAFRA&root-directory=frontend)
-
-1. Import the repository on [Vercel](https://vercel.com/new).
-2. Set Root Directory to `frontend`.
-3. Configure `NEXT_PUBLIC_API_BASE_URL` to your Render backend URL.
-4. Click **Deploy**.
-
-### Deploy Backend to Render:
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Premchandyadav369/SAFRA)
-
-1. Connect the repository on [Render](https://render.com).
-2. Render automatically parses `render.yaml` (Blueprint specification).
-3. Set environment variables:
-   - `HF_TOKEN`: *(Your Hugging Face token for Gemma 3)*
-   - `HF_MODEL_ID`: `google/gemma-3-12b-it`
-   - `DATABASE_URL`: `sqlite+aiosqlite:///./safra.db`
+### E. 5 Customer Behavioral Populations:
+- `NEW_CUSTOMER`, `RETURNING_CUSTOMER`, `HIGH_VALUE_CUSTOMER`, `SUBSCRIPTION_CUSTOMER`, `AT_RISK_CUSTOMER`.
+- Stateful agents with memory: `payment_success_history`, `retry_response_rate`, `intervention_fatigue`, and `fatigue_tolerance`.
 
 ---
 
-## 🛠️ 8. Local Development & Testing
+## 💥 4. 10 Incident Library & Flagship Scenario
+
+### 10 Predefined Major Incidents + Black Swan Mode:
+1. `PAYDAY_SURGE`: 3.8x traffic spike across UPI rails.
+2. `FLASH_SALE`: 5.2x checkout rush causing queue congestion.
+3. `BANK_LATENCY_DEGRADATION`: HDFC switch latency jumps to 2,400ms.
+4. `UPI_TIMEOUT_WAVE`: NPCI 504 gateway timeout cluster.
+5. `CARD_ISSUER_FAILURE`: 3DS2 card authorization server rejects 52% of attempts.
+6. `NETWORK_PARTITION`: Out-of-order webhook delivery requiring state machine reconciliation.
+7. `RECOVERY_QUEUE_OVERLOAD`: 10k+ failed payments requiring knapsack prioritization.
+8. `MULTI_PROVIDER_INCIDENT`: Simultaneous HDFC + SBI degradation.
+9. `CHECKOUT_ABANDONMENT_SPIKE`: SMS OTP delivery delays trigger 48% cart dropoff.
+10. `SILENT_REVENUE_LEAK`: Subtle 8.5% mandate degradation slowly leaking ₹12L/day.
+11. `★ BLACK SWAN MODE`: Payday Surge + Bank Latency + Network Delay + Retry Explosion.
+
+### Flagship Scenario: THE ₹10 CRORE PAYMENT DAY
+- 24-Hour simulated timeline across 250,000+ payments:
+  - **Total GMV:** ₹10,00,00,000
+  - **Peak Revenue at Risk:** ₹1,42,50,000
+  - **Baseline Recovery:** ₹48,20,000
+  - **SAFRA Adaptive Recovery:** ₹1,18,60,000
+  - **Net Incremental Value Created:** **+₹70,40,000**
+  - **Spam Interventions Avoided:** 42,180
+
+---
+
+## 📐 5. Mathematical & Statistical Formulations
+
+### A. Statistical Payment Distributions:
+- **Log-Normal Amount:** $\ln(X) \sim \mathcal{N}(\mu, \sigma^2)$ where $\mu = \ln(\text{Median AOV})$.
+- **Poisson Arrival Process:** Non-homogeneous Poisson timing with diurnal curve $\lambda(t) = \lambda_0 \cdot \text{diurnal}(t)$.
+- **Pareto Latency:** $P(X > x) = (x_m / x)^\alpha$ modeling long-tail banking spikes.
+
+### B. Prioritized Recovery Knapsack under Budget Constraints:
+$$\text{Priority} = \text{Amount} \times \hat{P}_{\text{recovery}} \times \text{Urgency} \times \text{CustomerLoyalty} \times \text{Feasibility}$$
+Subject to:
+$$\sum \text{Interventions} \le C_{\text{max\_rate}} \quad \text{and} \quad \sum \text{Cost} \le \text{Budget}_{\text{cap}}$$
+
+### C. Monte Carlo Research Engine:
+Executes $N \in [10, 50, 100]$ simulation trials across randomized seeds, computing 95% Confidence Intervals:
+$$\text{CI}_{95\%} = \bar{X} \pm 1.96 \cdot \frac{s}{\sqrt{N}}$$
+
+---
+
+## 📊 6. Benchmark Multi-Strategy Comparison
+
+| Performance Dimension | Strategy A (Retry All) | Strategy B (Top 30% Value) | Strategy C (Prob Threshold) | Strategy D (SAFRA Adaptive) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Interventions Count** | 500 (100% spam) | 150 actions | 185 actions | **142 bounded actions** |
+| **Intervention Cost** | ₹21,000 | ₹6,300 | ₹7,770 | **₹3,578 (Smart WAIT)** |
+| **Customer Fatigue** | 78.5 (Critical) | 42.0 (Elevated) | 32.0 (Moderate) | **14.5 (Healthy)** |
+| **Duplicate Debits** | 14.2% rate | 8.4% rate | 3.2% rate | **0.0% (HMAC Barrier)** |
+| **Net Value Created** | ₹14.38L | ₹23.42L | ₹29.15L | **₹39.71L (+₹25.33L)** |
+
+---
+
+## 🛠️ 7. Local Development & Testing
 
 ```bash
 # Clone the repository
@@ -208,7 +153,7 @@ cd backend
 pip install -r requirements.txt
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-# Run All 24 Pytest Unit, Crypto, Recovery, and Lab Tests
+# Run All 32 Pytest Unit, Crypto, Recovery, Simulation & Monte Carlo Tests
 pytest tests/ -v
 
 # Frontend Setup
